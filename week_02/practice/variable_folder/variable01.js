@@ -12,7 +12,7 @@ function sayHello()
     console.log(message);
 }
 
-console.log('=================================================================');
+console.log('=======');
 
 sayHello();
 console.log(message);
