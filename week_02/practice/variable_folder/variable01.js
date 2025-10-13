@@ -3,7 +3,7 @@
 // message = 'TI24I KEREENN';
 // alert(massage);
 
-let message
+let message;
 message = 'hello world!';
 
 function sayHello()
