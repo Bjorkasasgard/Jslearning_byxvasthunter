@@ -1,0 +1,12 @@
+{
+  "name": "@adambastian/calculactor",
+  "version": "1.0.0",
+  "description": "appcalculactor by adam bastian chaniago ti24i informatics engineering study program",
+  "main": "index.js",
+  "scripts": {
+    "test": "node Appcalculactor.js"
+  },
+  "keywords": ["calculactor", "adambastianchaniago", "nusaputrauniversity"],
+  "author": "Adam Bastian Chaniago",
+  "license": "ISC"
+}
