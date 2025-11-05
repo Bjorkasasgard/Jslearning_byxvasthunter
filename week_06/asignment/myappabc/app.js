@@ -5,10 +5,17 @@ var cookieParser = require('cookie-parser');
 var logger = require('morgan');
 
 // variable router
-var indexRouter = require('./routes/index'); // Menggunakan file index.js untuk rute utama
-var aboutRouter = require('./routes/about'); // Menambahkan rute untuk halaman about
+
+// SESSION_06 BELOW
+// var indexRouter = require('./routes/index'); // Menggunakan f-ile index.js untuk rute utama
+// var aboutRouter = require('./routes/about'); // Menambahkan rute untuk halaman about
+// var usersRouter = require('./routes/users');
+// var profileRouter = require('./routes/profile'); // Define a new router for profile
+
+// SESSION_07 BELLOW
+var indexRouter = require('./routes/index');
 var usersRouter = require('./routes/users');
-var profileRouter = require('./routes/profile'); // Define a new router for profile
+
 
 var app = express();
 
@@ -22,10 +29,18 @@ app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
 
+
+// SESSION_06 BELLOW
+// app.use('/', indexRouter);
+// app.use('/register', registerRouter); // FIX: Menggunakan path URL '/register'
+// app.use('/about', aboutRouter); // Mengarahkan path '/about' ke aboutRouter
+// app.use('/users', usersRouter); // ,engarahkan path '/users' ke usersRouter'
+// app.use('/users/profile', profileRouter); // Mengarahkan path '/users/profile' ke profileRouter
+
+// SESSION_07 BELLOW
 app.use('/', indexRouter);
-app.use('/about', aboutRouter); // Mengarahkan path '/about' ke aboutRouter
-app.use('/users', usersRouter); // ,engarahkan path '/users' ke usersRouter'
-app.use('/users/profile', profileRouter); // Mengarahkan path '/users/profile' ke profileRouter
+app.use('/users', usersRouter);
+
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {
