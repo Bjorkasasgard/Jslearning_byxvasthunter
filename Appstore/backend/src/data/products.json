@@ -1,5 +1,0 @@
-[
-  { "id": 1, "name": "ESP32", "price": 120000, "stock": 50 },
-  { "id": 2, "name": "NodeMCU V3", "price": 45000, "stock": 100 },
-  { "id": 3, "name": "Raspberry Pi 4", "price": 1500000, "stock": 20 }
-]
