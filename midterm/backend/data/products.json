@@ -1,0 +1,110 @@
+[
+  {
+    "id": 1,
+    "name": "robot emo",
+    "price": 7550000,
+    "quantity": 4,
+    "description": "Robot EMO adalah hewan peliharaan robot desktop bertenaga AI yang memiliki kepribadian dan dapat berinteraksi dengan penggunanya",
+    "image": "5fd1586ff79628b23d867608a1446d93.jpeg",
+    "url": "http://localhost:5000/images/5fd1586ff79628b23d867608a1446d93.jpeg"
+  },
+  {
+    "id": 2,
+    "name": "mobil remote control",
+    "price": 2000000,
+    "quantity": 7,
+    "description": "Ayo ciptakan petualangan seru untuk si kecil!\r\nMobil Remote Control Offroad Monster Truck ini hadir untuk memberikan pengalaman bermain yang tak terlupakan. Dirancang dengan desain gagah dan ban besar, mobil ini siap melibas berbagai medan. Dengan kendali yang responsif, si kecil bisa mengendalikan mobil ini untuk melaju kencang, menanjak, dan berbelok dengan mudah.",
+    "image": "d6b46b6b2dcd15ccb5b92150f3765e2d.jpeg",
+    "url": "http://localhost:5000/images/d6b46b6b2dcd15ccb5b92150f3765e2d.jpeg"
+  },
+  {
+    "id": 3,
+    "name": "skincare for men",
+    "price": 149000,
+    "quantity": 29,
+    "description": "Tampil lebih fresh dan percaya diri dengan Nivea For Men Basic Series!\r\nPaket perawatan kulit harian yang dirancang khusus untuk pria aktif yang menginginkan hasil maksimal tanpa proses yang rumit. Formula yang cepat meresap dan tidak lengket, cocok untuk semua jenis kulit pria Indonesia.",
+    "image": "ebf194e840c5ddf978a8539d522b4807.jpeg",
+    "url": "http://localhost:5000/images/ebf194e840c5ddf978a8539d522b4807.jpeg"
+  },
+  {
+    "id": 4,
+    "name": "toys for kid",
+    "price": 59000,
+    "quantity": 30,
+    "description": "Ajak si kecil bermain sambil belajar dengan Balok Susun Edukasi kami! 🧠\r\nMainan klasik yang tak lekang oleh waktu ini dirancang untuk merangsang kreativitas, kemampuan motorik halus, dan kecerdasan spasial anak Anda. Terbuat dari kayu solid berkualitas dengan cat non-toksik yang aman untuk si buah hati.",
+    "image": "500b31534b66c3ed6e1d55aee250675a.jpeg",
+    "url": "http://localhost:5000/images/500b31534b66c3ed6e1d55aee250675a.jpeg"
+  },
+  {
+    "id": 5,
+    "name": "Disney Stitch Plush",
+    "price": 90000,
+    "quantity": 7,
+    "description": "Hadirkan alien biru paling menggemaskan, Stitch, ke rumah Anda! 💙\r\nBoneka plush Stitch ini adalah produk resmi berlisensi Disney, dengan kualitas premium dari MINISO. Dibuat dengan bahan yang super lembut dan isian yang empuk, boneka ini nyaman sekali untuk dipeluk, dijadikan teman tidur, atau hiasan kamar yang ceria.",
+    "image": "a98184af1864c4000b6b45a71f9b6333.jpeg",
+    "url": "http://localhost:5000/images/a98184af1864c4000b6b45a71f9b6333.jpeg"
+  },
+  {
+    "id": 6,
+    "name": "Winnie The Pooh plush Lucu & Lembut",
+    "price": 89000,
+    "quantity": 11,
+    "description": "Boneka Winnie the Pooh ini hadir untuk membawa kehangatan dan kebahagiaan bagi si kecil atau orang tersayang. Dibuat dengan bahan plush berkualitas tinggi yang super lembut, boneka ini sangat nyaman untuk dipeluk, cocok menjadi teman tidur setia bagi anak Anda.",
+    "image": "a0e12f13439834ea45c791d1b980063c.jpeg",
+    "url": "http://localhost:5000/images/a0e12f13439834ea45c791d1b980063c.jpeg"
+  },
+  {
+    "id": 7,
+    "name": "Boneka Plush Nemo Ikan Badut Disney Pixar Finding Nemo Lucu",
+    "price": 99000,
+    "quantity": 8,
+    "description": "Hadirkan petualangan bawah laut Finding Nemo ke kamar si kecil dengan boneka plush Nemo ini. Dibuat dengan bahan yang sangat lembut, boneka ini sempurna untuk dipeluk, dijadikan teman bermain, atau hiasan tempat tidur yang ceria.",
+    "image": "26614aa9c7de4f071466decdc47f8644.jpeg",
+    "url": "http://localhost:5000/images/26614aa9c7de4f071466decdc47f8644.jpeg"
+  },
+  {
+    "id": 8,
+    "name": "Boneka Plush Dory Ikan Blue Tang Disney Pixar Finding Dory Lucu Lembut",
+    "price": 90000,
+    "quantity": 18,
+    "description": "Hadirkan keceriaan petualangan bawah laut Finding Dory ke rumah Anda dengan boneka plush Dory yang menggemaskan ini. Dibuat dengan bahan yang sangat lembut dan isian empuk, boneka ini sempurna untuk dipeluk, dijadikan teman bermain, atau hiasan kamar tidur.",
+    "image": "3bad3befa8887b10f928bb2730ce5ca9.jpeg",
+    "url": "http://localhost:5000/images/3bad3befa8887b10f928bb2730ce5ca9.jpeg"
+  },
+  {
+    "id": 9,
+    "name": "Boneka Plush Jerry Tikus Tom and Jerry Lucu Lembut SNI",
+    "price": 78000,
+    "quantity": 30,
+    "description": "Boneka plush Jerry ini siap menjadi teman bermain yang setia bagi si kecil, atau tambahan koleksi nostalgia bagi para penggemar kartun klasik Tom and Jerry.",
+    "image": "9e1c813c345af300fab9300e5c2e6306.jpeg",
+    "url": "http://localhost:5000/images/9e1c813c345af300fab9300e5c2e6306.jpeg"
+  },
+  {
+    "id": 10,
+    "name": "PAKET Boneka Plush Tom and Jerry ",
+    "price": 179000,
+    "quantity": 15,
+    "description": "Duo paling ikonik dari dunia kartun kini hadir di rumah Anda! \r\nDapatkan sepasang boneka plush Tom (kucing) dan Jerry (tikus) dalam satu paket penjualan yang menggemaskan ini. Ideal untuk hadiah ulang tahun, koleksi penggemar setia, atau teman bermain si kecil. Dibuat dengan bahan super lembut dan aman ber-SNI.",
+    "image": "f324319112c4df204f7128d6cebd830d.jpeg",
+    "url": "http://localhost:5000/images/f324319112c4df204f7128d6cebd830d.jpeg"
+  },
+  {
+    "id": 11,
+    "name": "Mobil Remote Control bumblebee Fighter",
+    "price": 3490000,
+    "quantity": 12,
+    "description": "Mobil Remote Control \"bumblebee\" ini didesain khusus untuk para jagoan kecil usia 3 hingga 8 tahun. Dengan tampilan gagah dan ketahanan bodi yang sudah teruji, mainan ini siap menemani petualangan si kecil melibas berbagai medan, baik di dalam maupun luar ruangan.",
+    "image": "86d951ba28dd5fdd9df1c6fb9c8169d9.jpeg",
+    "url": "http://localhost:5000/images/86d951ba28dd5fdd9df1c6fb9c8169d9.jpeg"
+  },
+  {
+    "id": 12,
+    "name": "Mobil Remote Control Off-Road ",
+    "price": 1119000,
+    "quantity": 20,
+    "description": "Mobil Remote Control \"Off-Road Fighter\" ini didesain khusus untuk para jagoan keci",
+    "image": "0814bd80d89c3f187b9b8e385a60bac9.jpeg",
+    "url": "http://localhost:5000/images/0814bd80d89c3f187b9b8e385a60bac9.jpeg"
+  }
+]
