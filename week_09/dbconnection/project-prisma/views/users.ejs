@@ -1,0 +1,21 @@
+<%- include("partials/header") %>
+
+<div class="container p-5">
+    <h2>All Users</h2>
+
+    <table class="table table-bordered">
+        <tr>
+            <th>ID</th><th>Name</th><th>Email</th>
+        </tr>
+
+        <% users.forEach(u => { %>
+        <tr>
+            <td><%= u.id %></td>
+            <td><%= u.name %></td>
+            <td><%= u.email %></td>
+        </tr>
+        <% }) %>
+    </table>
+</div>
+
+<%- include("partials/footer") %>
