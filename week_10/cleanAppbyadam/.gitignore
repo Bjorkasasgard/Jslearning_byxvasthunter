@@ -1,0 +1,31 @@
+.DS_Store
+node_modules/
+
+# Environment files
+.env
+.env.local
+
+# Prisma generated client (if you put client in generated/)
+/generated/prisma
+
+# Local SQLite DB
+prisma/db.sqlite
+*.sqlite
+
+# Developer-only scripts
+dev-scripts/
+
+# IDE configs
+.vscode/
+.idea/
+
+# Logs
+npm-debug.log*
+node_modules
+# Keep environment variables out of version control
+.env
+
+/generated/prisma
+
+# Ignore developer-only scripts
+dev-scripts/

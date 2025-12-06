@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Edit User</title>
+    <link rel='stylesheet' href='/stylesheets/style.css' />
+    <script src="https://cdn.tailwindcss.com"></script>
+  </head>
+  <body class="bg-gray-50 p-6">
+    <div class="max-w-xl mx-auto">
+      <header class="mb-6">
+        <h1 class="text-2xl font-bold text-gray-800">Edit User</h1>
+        <p class="text-sm text-gray-500">Update the fields and click Update to save changes.</p>
+      </header>
+
+      <div class="bg-white rounded-lg shadow p-6">
+        <form action="/edit/<%= user.id %>" method="POST" class="space-y-4">
+          <div>
+            <label for="name" class="block text-sm font-medium text-gray-700">Name</label>
+            <input type="text" id="name" name="name" value="<%= user.name %>" required class="mt-1 block w-full border border-gray-200 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-200" autofocus />
+          </div>
+
+          <div>
+            <label for="email" class="block text-sm font-medium text-gray-700">Email</label>
+            <input type="email" id="email" name="email" value="<%= user.email %>" required class="mt-1 block w-full border border-gray-200 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-200" />
+          </div>
+
+          <div>
+            <label for="phone" class="block text-sm font-medium text-gray-700">Phone (optional)</label>
+            <input type="tel" id="phone" name="phone" value="<%= user.phone %>" class="mt-1 block w-full border border-gray-200 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-200" />
+          </div>
+
+          <div class="flex items-center gap-3">
+            <button type="submit" class="bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 px-4 rounded-md">Update</button>
+            <a href="/" class="bg-gray-100 hover:bg-gray-200 text-gray-800 px-3 py-2 rounded-md text-sm">Cancel</a>
+          </div>
+        </form>
+      </div>
+    </div>
+  </body>
+</html>
