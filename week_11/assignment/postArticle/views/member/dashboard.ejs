@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title><%= title %> - Post Article</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+</head>
+<body>
+    <!-- Navbar -->
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark mb-4">
+        <div class="container">
+            <a class="navbar-brand" href="/">PostArticle</a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ms-auto">
+                    <li class="nav-item">
+                        <span class="nav-link text-light">Hi, <%= user.name %> (<%= user.role %>)</span>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link active" href="/dashboard">Dashboard</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/">Home</a>
+                    </li>
+                    <li class="nav-item">
+                        <form action="/logout" method="POST" class="d-inline">
+                            <button class="btn nav-link" type="submit">Logout</button>
+                        </form>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <h1><%= user.role === 'ADMIN' ? 'All Posts (Admin View)' : 'My Posts' %></h1>
+            <a href="/dashboard/posts/new" class="btn btn-primary">Create New Post</a>
+        </div>
+
+        <div class="card shadow-sm">
+            <div class="card-body">
+                <% if (posts && posts.length > 0) { %>
+                    <div class="table-responsive">
+                        <table class="table table-hover align-middle">
+                            <thead class="table-light">
+                                <tr>
+                                    <th scope="col" style="width: 5%">#</th>
+                                    <th scope="col" style="width: 40%">Title</th>
+                                    <% if (user.role === 'ADMIN') { %>
+                                    <th scope="col" style="width: 20%">Author</th>
+                                    <% } %>
+                                    <th scope="col" style="width: 20%">Created At</th>
+                                    <th scope="col" style="width: 15%">Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <% posts.forEach((post, index) => { %>
+                                    <tr>
+                                        <td><%= index + 1 %></td>
+                                        <td><%= post.title %></td>
+                                        <% if (user.role === 'ADMIN') { %>
+                                        <td><%= post.author ? post.author.name : 'Unknown' %></td>
+                                        <% } %>
+                                        <td><%= new Date(post.createdAt).toLocaleDateString('id-ID', { day: 'numeric', month: 'short', year: 'numeric' }) %></td>
+                                        <td>
+                                            <a href="/posts/<%= post.id %>" class="btn btn-sm btn-info text-white me-1" target="_blank">View</a>
+                                            <a href="/dashboard/posts/<%= post.id %>/edit" class="btn btn-sm btn-warning me-1">Edit</a>
+                                            
+                                            <!-- Delete Button Trigger Modal -->
+                                            <button type="button" class="btn btn-sm btn-danger" data-bs-toggle="modal" data-bs-target="#deleteModal<%= post.id %>">
+                                                Delete
+                                            </button>
+
+                                            <!-- Delete Modal -->
+                                            <div class="modal fade" id="deleteModal<%= post.id %>" tabindex="-1" aria-hidden="true">
+                                                <div class="modal-dialog">
+                                                    <div class="modal-content">
+                                                        <div class="modal-header">
+                                                            <h5 class="modal-title">Confirm Delete</h5>
+                                                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                                        </div>
+                                                        <div class="modal-body">
+                                                            Are you sure you want to delete "<%= post.title %>"?
+                                                        </div>
+                                                        <div class="modal-footer">
+                                                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                                                            <form action="/dashboard/posts/<%= post.id %>/delete" method="POST" class="d-inline">
+                                                                <button type="submit" class="btn btn-danger">Delete</button>
+                                                            </form>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                <% }) %>
+                            </tbody>
+                        </table>
+                    </div>
+                <% } else { %>
+                    <div class="text-center py-5">
+                        <p class="text-muted mb-3">No posts found.</p>
+                        <a href="/dashboard/posts/new" class="btn btn-outline-primary">Create Your First Post</a>
+                    </div>
+                <% } %>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>
