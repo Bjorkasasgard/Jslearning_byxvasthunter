@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8" />
+  <title>Incident Monitoring</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
+
+<body class="bg-slate-100 min-h-screen text-gray-800 flex flex-col">
+
+  <!-- HEADER -->
+  <header class="sticky top-0 z-50 bg-white/80 backdrop-blur border-b border-gray-200 shadow-sm">
+    <div class="max-w-7xl mx-auto px-6 sm:px-10 py-4
+                flex items-center justify-between">
+
+      <div>
+        <h1 class="text-lg font-semibold tracking-tight text-indigo-700">
+          Incident Monitoring
+        </h1>
+        <p class="text-xs text-gray-500">
+          Administrative security incident overview
+        </p>
+      </div>
+
+      <a href="/"
+         class="inline-flex items-center gap-2 px-4 py-2
+                text-sm font-medium rounded-lg
+                border border-gray-200 text-gray-600
+                hover:bg-gray-50 hover:text-gray-900 transition">
+        ← Dashboard
+      </a>
+    </div>
+  </header>
+
+  <!-- MAIN -->
+  <main class="flex-1 max-w-7xl mx-auto px-6 sm:px-10 py-14 w-full space-y-10">
+
+    <% if (incidents.length === 0) { %>
+
+      <!-- EMPTY STATE -->
+      <section class="bg-white border rounded-2xl px-8 py-12 text-center">
+        <p class="text-sm text-gray-600">
+          Belum ada laporan insiden yang masuk.
+        </p>
+      </section>
+
+    <% } else { %>
+
+    <!-- TABLE SECTION -->
+    <section class="bg-white border rounded-2xl overflow-hidden">
+
+      <!-- TABLE HEADER -->
+      <div class="px-8 py-5 border-b">
+        <h2 class="text-base font-semibold text-gray-900">
+          Incident Reports
+        </h2>
+        <p class="text-xs text-gray-500">
+          Daftar seluruh laporan insiden keamanan
+        </p>
+      </div>
+
+      <!-- TABLE -->
+      <div class="overflow-x-auto">
+        <table class="min-w-full text-sm">
+
+          <thead class="bg-gray-50 text-gray-500">
+            <tr>
+              <th class="px-6 py-4 text-left font-medium">User</th>
+              <th class="px-6 py-4 text-left font-medium">Incident Type</th>
+              <th class="px-6 py-4 text-left font-medium">Risk</th>
+              <th class="px-6 py-4 text-left font-medium">Created At</th>
+              <th class="px-6 py-4 text-center font-medium">Action</th>
+            </tr>
+          </thead>
+
+          <tbody class="divide-y">
+
+            <% incidents.forEach(incident => { %>
+            <tr class="hover:bg-gray-50 transition">
+
+              <!-- USER -->
+              <td class="px-6 py-4">
+                <div class="font-medium text-gray-900">
+                  <%= incident.user.username %>
+                </div>
+                <div class="text-xs text-gray-500">
+                  <%= incident.user.role %>
+                </div>
+              </td>
+
+              <!-- TYPE -->
+              <td class="px-6 py-4 text-gray-700">
+                <%= incident.incidentType %>
+              </td>
+
+              <!-- RISK -->
+              <td class="px-6 py-4">
+                <span class="inline-flex items-center px-2.5 py-1
+                             rounded-full text-xs font-medium
+                  <%= incident.riskLevel === 'HIGH'
+                    ? 'bg-red-100 text-red-700'
+                    : incident.riskLevel === 'MEDIUM'
+                    ? 'bg-yellow-100 text-yellow-700'
+                    : 'bg-emerald-100 text-emerald-700' %>">
+                  <%= incident.riskLevel %>
+                </span>
+              </td>
+
+              <!-- DATE -->
+              <td class="px-6 py-4 text-gray-600">
+                <%= new Date(incident.createdAt).toLocaleString('id-ID') %>
+              </td>
+
+              <!-- ACTION -->
+              <td class="px-6 py-4 text-center">
+                <a href="/incident/result/<%= incident.id %>"
+                   class="inline-flex items-center gap-1
+                          text-sm font-medium text-indigo-600
+                          hover:text-indigo-800 transition">
+                  View Details →
+                </a>
+              </td>
+
+            </tr>
+            <% }) %>
+
+          </tbody>
+        </table>
+      </div>
+
+    </section>
+
+    <% } %>
+
+  </main>
+
+
+</body>
+</html>

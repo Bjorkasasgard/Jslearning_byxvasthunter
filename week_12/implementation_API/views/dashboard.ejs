@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8" />
+  <title>Dashboard</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
+
+<body class="bg-slate-100 text-gray-800 min-h-screen flex flex-col">
+
+  <!-- HEADER -->
+  <header class="sticky top-0 z-50 bg-white/80 backdrop-blur border-b border-gray-200 shadow-sm">
+    <div class="max-w-7xl mx-auto px-4 sm:px-8 py-4
+                flex items-center justify-between">
+
+      <!-- Brand -->
+      <div>
+        <h1 class="text-lg font-semibold tracking-tight text-indigo-700">
+          AI Security Incident Assistant
+        </h1>
+        <p class="text-xs text-gray-500">
+          Incident analysis & decision support system
+        </p>
+      </div>
+
+      <!-- User -->
+      <div class="flex items-center gap-4">
+        <div class="text-right hidden sm:block">
+          <p class="text-sm font-medium text-gray-900">
+            <%= user.username %>
+          </p>
+          <p class="text-xs text-gray-500">
+            <%= user.role.toLowerCase() %>
+          </p>
+        </div>
+
+        <!-- Logout Icon -->
+        <a href="/logout"
+           title="Logout"
+           class="p-2 rounded-lg border border-gray-200
+                  hover:bg-red-50 hover:border-red-200
+                  text-gray-500 hover:text-red-600 transition">
+          <svg xmlns="http://www.w3.org/2000/svg"
+               class="w-5 h-5"
+               fill="none"
+               viewBox="0 0 24 24"
+               stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                  d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a2 2 0 01-2 2H5a2 2 0 01-2-2V7a2 2 0 012-2h6a2 2 0 012 2v1" />
+          </svg>
+        </a>
+      </div>
+    </div>
+  </header>
+
+  <!-- MAIN -->
+<main class="flex-1 max-w-7xl mx-auto px-6 sm:px-10 py-14 space-y-14 w-full">
+
+  <!-- WELCOME -->
+  <section class="bg-white border rounded-2xl px-8 py-7">
+    <h2 class="text-xl font-semibold text-gray-900 mb-2">
+      Welcome back, <%= user.username %>
+    </h2>
+    <p class="text-sm text-gray-600 max-w-3xl">
+      Manage, analyze, and track cybersecurity incidents using AI-assisted
+      decision support.
+      <% if (user.role === 'ADMIN') { %>
+        You have system-wide visibility.
+      <% } %>
+    </p>
+  </section>
+
+  <!-- STATS -->
+  <section>
+    <h3 class="text-sm font-medium text-gray-500 mb-4">
+      Incident Overview
+    </h3>
+
+    <div class="grid grid-cols-1 sm:grid-cols-3 gap-6">
+
+      <div class="bg-white border rounded-xl p-6">
+        <p class="text-xs text-gray-500 mb-1">
+          <% if (user.role === 'ADMIN') { %>Total Incidents<% } else { %>Reported Incidents<% } %>
+        </p>
+        <p class="text-3xl font-semibold text-gray-900">
+          <%= stats.total %>
+        </p>
+      </div>
+
+      <div class="bg-white border rounded-xl p-6">
+        <p class="text-xs text-gray-500 mb-1">
+          <% if (user.role === 'ADMIN') { %>High Risk<% } else { %>Under Analysis<% } %>
+        </p>
+        <p class="text-3xl font-semibold text-gray-900">
+          <%= stats.underAnalysis %>
+        </p>
+      </div>
+
+      <div class="bg-white border rounded-xl p-6">
+        <p class="text-xs text-gray-500 mb-1">
+          Resolved
+        </p>
+        <p class="text-3xl font-semibold text-gray-900">
+          <%= stats.resolved %>
+        </p>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- ACTIONS -->
+  <section class="grid grid-cols-1 md:grid-cols-2 gap-6">
+
+    <div class="bg-white border rounded-2xl p-7">
+      <h3 class="text-base font-semibold text-gray-900 mb-2">
+        Submit Security Incident
+      </h3>
+      <p class="text-sm text-gray-600 mb-6">
+        Report phishing, malware, unauthorized access,
+        or suspicious system behavior.
+      </p>
+      <a href="/incident"
+         class="inline-flex items-center px-4 py-2
+                bg-indigo-600 hover:bg-indigo-700
+                text-white text-sm font-medium rounded-lg transition">
+        Create Incident
+      </a>
+    </div>
+
+    <% if (user.role === 'ADMIN') { %>
+    <div class="bg-white border rounded-2xl p-7">
+      <h3 class="text-base font-semibold text-gray-900 mb-2">
+        Incident Monitoring
+      </h3>
+      <p class="text-sm text-gray-600 mb-6">
+        Review and analyze all incident reports
+        across the system.
+      </p>
+      <a href="/admin/incidents"
+         class="inline-flex items-center px-4 py-2
+                border border-gray-300
+                text-gray-700 hover:bg-gray-50
+                text-sm font-medium rounded-lg transition">
+        View Reports
+      </a>
+    </div>
+    <% } %>
+
+  </section>
+
+  <!-- NEWS -->
+  <section>
+    <h3 class="text-sm font-medium text-gray-500 mb-4">
+      Latest Cybersecurity News
+    </h3>
+
+    <% if (articles && articles.length > 0) { %>
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+
+      <% articles.forEach(article => { %>
+      <a href="<%= article.url %>" target="_blank"
+         class="bg-white border rounded-xl overflow-hidden
+                hover:shadow-md transition flex flex-col">
+        <% if (article.urlToImage) { %>
+        <img src="<%= article.urlToImage %>"
+             class="h-36 w-full object-cover">
+        <% } %>
+        <div class="p-5 flex flex-col gap-2">
+          <h4 class="text-sm font-semibold text-gray-900">
+            <%= article.title %>
+          </h4>
+          <p class="text-xs text-gray-500">
+            <%= article.source.name %>
+          </p>
+        </div>
+      </a>
+      <% }) %>
+
+    </div>
+    <% } else { %>
+    <div class="bg-white border rounded-xl p-6 text-sm text-gray-600">
+      News feed unavailable.
+    </div>
+    <% } %>
+  </section>
+
+</main>
+
+
+</body>
+</html>

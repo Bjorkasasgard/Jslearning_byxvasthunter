@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="id">
+
+<head>
+  <meta charset="UTF-8" />
+  <title>Login | AI Security Incident Assistant</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
+
+<body class="bg-slate-50 min-h-screen flex items-center justify-center px-4">
+
+  <div class="w-full max-w-md">
+
+    <!-- App Info -->
+    <div class="text-center mb-8">
+      <h1 class="text-2xl font-semibold text-indigo-700 tracking-tight">
+        AI Security Incident Assistant
+      </h1>
+      <p class="mt-1 text-sm text-gray-500">
+        Secure access to incident analysis system
+      </p>
+    </div>
+
+    <!-- Card -->
+    <div class="bg-white border border-gray-200 rounded-xl shadow-sm p-6 sm:p-8">
+
+      <h2 class="text-lg font-semibold text-gray-900 mb-1">
+        Sign in to your account
+      </h2>
+      <p class="text-sm text-gray-500 mb-6">
+        Enter your credentials to continue
+      </p>
+
+      <!-- Error -->
+      <% if (typeof error !=='undefined' ) { %>
+        <div class="mb-4 rounded-md border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
+          <%= error %>
+        </div>
+        <% } %>
+
+          <!-- Form -->
+          <form method="POST" action="/login" class="space-y-5">
+
+            <div>
+              <label class="block text-sm font-medium text-gray-700 mb-1">
+                Username
+              </label>
+              <input type="text" name="username" required placeholder="Enter your username" class="w-full rounded-md border border-gray-300 px-3 py-2 text-sm
+                   focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500" />
+            </div>
+
+            <div>
+              <label class="block text-sm font-medium text-gray-700 mb-1">
+                Password
+              </label>
+              <input type="password" name="password" required placeholder="••••••••" class="w-full rounded-md border border-gray-300 px-3 py-2 text-sm
+                   focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500" />
+            </div>
+
+            <button type="submit" class="w-full rounded-md bg-indigo-600 px-4 py-2.5
+                 text-sm font-medium text-white
+                 hover:bg-indigo-700 transition">
+              Login
+            </button>
+
+          </form>
+
+          <p class="mt-6 text-center text-sm text-gray-600">
+            Don't have an account?
+            <a href="/register" class="font-medium text-indigo-600 hover:text-indigo-800">
+              Register
+            </a>
+          </p>
+
+    </div>
+
+    <!-- Footer -->
+    <p class="mt-6 text-center text-xs text-gray-400">
+      © 2025 AI Security Incident Assistant | Adam Bastian Chaniago
+    </p>
+
+  </div>
+
+</body>
+
+</html>

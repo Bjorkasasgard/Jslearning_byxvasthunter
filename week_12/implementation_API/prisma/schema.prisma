@@ -1,0 +1,39 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id        Int              @id @default(autoincrement())
+  username  String           @unique
+  password  String
+  role      Role             @default(USER)
+  incidents IncidentReport[]
+  createdAt DateTime         @default(now())
+}
+
+model IncidentReport {
+  id             Int      @id @default(autoincrement())
+  description    String   // input user
+  incidentType   String   // phishing, malware, dll
+  riskLevel      String   // LOW | MEDIUM | HIGH
+  analysis       String   // penjelasan AI
+  recommendation String   // langkah yang disarankan
+  userId         Int
+  user           User     @relation(fields: [userId], references: [id])
+  createdAt      DateTime @default(now())
+}
+
+enum Role {
+  USER
+  ADMIN
+}

@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html lang="id">
+
+<head>
+  <meta charset="UTF-8" />
+  <title>Incident Analysis Result</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
+
+<body class="bg-slate-100 text-gray-800 min-h-screen flex flex-col">
+
+  <!-- HEADER -->
+  <header class="sticky top-0 z-50 bg-white/80 backdrop-blur border-b border-gray-200 shadow-sm">
+    <div class="max-w-7xl mx-auto px-4 sm:px-8 py-4 flex items-center justify-between">
+
+      <!-- Brand -->
+      <div>
+        <h1 class="text-lg font-semibold tracking-tight text-indigo-700">
+          AI Security Incident Assistant
+        </h1>
+        <p class="text-xs text-gray-500">
+          Incident analysis result
+        </p>
+      </div>
+
+      <!-- Back -->
+      <a href="/" class="inline-flex items-center gap-2 px-4 py-2
+                text-sm font-medium rounded-lg
+                border border-gray-200 text-gray-600
+                hover:bg-gray-50 hover:text-gray-900 transition">
+        <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" />
+        </svg>
+        Dashboard
+      </a>
+    </div>
+  </header>
+
+  <!-- MAIN -->
+  <main class="flex-1 max-w-7xl mx-auto px-6 sm:px-10 py-14 w-full space-y-10">
+
+    <!-- INCIDENT SUMMARY -->
+    <section class="bg-white border rounded-2xl px-8 py-7">
+
+      <div class="flex items-center gap-3 mb-4">
+        <div class="p-2 rounded-lg bg-indigo-50 text-indigo-600">
+          <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+              d="M9 12h6m-6 4h6m-6-8h6M7 20h10a2 2 0 002-2V6a2 2 0 00-2-2H9l-4 4v10a2 2 0 002 2z" />
+          </svg>
+        </div>
+        <h2 class="text-xl font-semibold text-gray-900">
+          Incident Summary
+        </h2>
+      </div>
+
+      <div class="space-y-4">
+
+        <div>
+          <p class="text-xs uppercase tracking-wide text-gray-400">
+            Reported By
+          </p>
+          <p class="text-sm font-medium text-gray-900">
+            <%= incident.user.username %>
+          </p>
+        </div>
+
+        <div>
+          <p class="text-xs uppercase tracking-wide text-gray-400">
+            Submitted At
+          </p>
+          <p class="text-sm text-gray-700">
+            <%= new Date(incident.createdAt).toLocaleString() %>
+          </p>
+        </div>
+
+        <div>
+          <p class="text-xs uppercase tracking-wide text-gray-400">
+            Description
+          </p>
+          <p class="mt-2 text-sm text-gray-800 leading-relaxed whitespace-pre-line">
+            <%= incident.description %>
+          </p>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- AI ANALYSIS -->
+    <section class="bg-white border rounded-2xl px-8 py-7">
+
+      <div class="flex items-center gap-3 mb-4">
+        <div class="p-2 rounded-lg bg-gray-100 text-gray-600">
+          <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z" />
+          </svg>
+        </div>
+        <h3 class="text-lg font-semibold text-gray-900">
+          AI Security Analysis
+        </h3>
+      </div>
+
+      <% if (incident.analysis) { %>
+        <p class="text-sm text-gray-700 leading-relaxed whitespace-pre-line">
+          <%= incident.analysis %>
+        </p>
+        <% } else { %>
+          <p class="text-sm text-gray-500 italic">
+            Analysis is currently unavailable.
+          </p>
+          <% } %>
+
+    </section>
+
+    <!-- RECOMMENDATIONS -->
+    <section class="bg-white border rounded-2xl px-8 py-7">
+
+      <div class="flex items-center gap-3 mb-4">
+        <div class="p-2 rounded-lg bg-emerald-50 text-emerald-600">
+          <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+              d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+          </svg>
+        </div>
+        <h3 class="text-lg font-semibold text-gray-900">
+          Recommended Actions
+        </h3>
+      </div>
+
+      <% if (incident.recommendation) { %>
+        <ul class="space-y-2 text-sm text-gray-700 list-disc list-inside">
+          <% incident.recommendation.split('\n').forEach(item=> { %>
+            <li>
+              <%= item %>
+            </li>
+            <% }) %>
+        </ul>
+        <% } else { %>
+          <p class="text-sm text-gray-500 italic">
+            No recommendations available.
+          </p>
+          <% } %>
+
+    </section>
+
+    <!-- ACTION BUTTONS -->
+    <section class="flex items-center justify-between">
+      <a href="/incident" class="inline-flex items-center gap-2 px-6 py-2.5
+                bg-indigo-600 hover:bg-indigo-700
+                text-white text-sm font-medium
+                rounded-lg shadow-sm transition">
+       <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
+        </svg>
+          Report Another Incident
+      </a>
+
+    </section>
+  </main>
+
+</body>
+
+</html>
