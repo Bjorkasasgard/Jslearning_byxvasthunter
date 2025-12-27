@@ -1,0 +1,1 @@
+// rest enpoints for vacancies (api)

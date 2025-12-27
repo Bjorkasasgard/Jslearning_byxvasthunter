@@ -1,0 +1,1 @@
+// auth middle ware (view)
