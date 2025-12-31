@@ -1,0 +1,35 @@
+<h1 class="text-2xl font-bold"><%= job.title %></h1>
+
+<p class="mt-2"><strong>Company:</strong> <%= job.company %></p>
+<p><strong>Location:</strong> <%= job.location %></p>
+
+<p class="mt-4"><%= job.description %></p>
+
+<form id="applyForm" class="mt-6">
+  <textarea
+    class="w-full border p-2"
+    placeholder="Cover letter"
+    id="coverLetter"
+  ></textarea>
+
+  <button
+    type="submit"
+    class="mt-2 bg-blue-600 text-white px-4 py-2 rounded"
+  >
+    Apply Job
+  </button>
+</form>
+
+<script src="/javascripts/api.js"></script>
+<script>
+  document.getElementById("applyForm").addEventListener("submit", async (e) => {
+    e.preventDefault();
+    const coverLetter = document.getElementById("coverLetter").value;
+
+    await apiRequest("/api/vacancies/<%= job.id %>/apply", "POST", {
+      coverLetter
+    });
+
+    alert("Application submitted");
+  });
+</script>

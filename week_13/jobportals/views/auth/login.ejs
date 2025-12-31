@@ -1,0 +1,28 @@
+<form id="loginForm">
+  <input id="email" placeholder="Email" />
+  <input id="password" type="password" placeholder="Password" />
+  <button>Login</button>
+</form>
+
+<script src="/javascripts/api.js"></script>
+<script>
+  document.getElementById("loginForm").addEventListener("submit", async (e) => {
+    e.preventDefault();
+
+    const res = await apiRequest("/api/auth/login", "POST", {
+      email: email.value,
+      password: password.value
+    });
+
+    // 🔑 simpan token
+    localStorage.setItem("token", res.token);
+    localStorage.setItem("role", res.user.role);
+
+    // 🔀 redirect berdasarkan role
+    if (res.user.role === "ADMIN") {
+      window.location.href = "/admin";
+    } else {
+      window.location.href = "/jobs";
+    }
+  });
+</script>

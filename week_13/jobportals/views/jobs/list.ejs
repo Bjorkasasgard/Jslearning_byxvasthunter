@@ -1,0 +1,11 @@
+<h1 class="text-2xl font-bold mb-4">Job Vacancies</h1>
+
+<ul class="space-y-4">
+  <% jobs.forEach(job => { %>
+    <li class="bg-white p-4 rounded shadow">
+      <h2 class="text-xl font-semibold"><%= job.title %></h2>
+      <p><%= job.company %> — <%= job.location %></p>
+      <a href="/jobs/<%= job.id %>" class="text-blue-600">View Detail</a>
+    </li>
+  <% }) %>
+</ul>

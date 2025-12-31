@@ -1,0 +1,68 @@
+<h1 class="text-2xl font-bold mb-4">
+  <%= user ? "Edit User" : "Create User" %>
+</h1>
+
+<form id="userForm" class="space-y-4">
+  <input
+    class="border p-2 w-full"
+    placeholder="Name"
+    id="name"
+    value="<%= (user && user.name) || '' %>"
+  />
+
+  <input
+    class="border p-2 w-full"
+    placeholder="Email"
+    id="email"
+    value="<%= (user && user.email) || '' %>"
+  />
+
+  <% if (!user) { %>
+    <input
+      type="password"
+      class="border p-2 w-full"
+      placeholder="Password"
+      id="password"
+    />
+  <% } %>
+
+  <select id="role" name="role" class="border p-2 w-full">
+    <option value="MEMBER" <%= (user && user.role === "MEMBER") ? "selected" : "" %>>
+      MEMBER
+    </option>
+    <option value="ADMIN" <%= (user && user.role === "ADMIN") ? "selected" : "" %>>
+      ADMIN
+    </option>
+  </select>
+
+  <button class="bg-blue-600 text-white px-4 py-2 rounded">
+    Save
+  </button>
+</form>
+
+<script src="/javascripts/api.js"></script>
+<script>
+  const isEdit = <%= JSON.stringify(!!user) %>;
+  const userId = <%= JSON.stringify(user ? user.id : null) %>;
+
+  document.getElementById("userForm").addEventListener("submit", async (e) => {
+    e.preventDefault();
+    const payload = {
+      name: document.getElementById('name').value,
+      email: document.getElementById('email').value,
+      role: document.getElementById('role').value
+    };
+
+    if (!isEdit) {
+      payload.password = document.getElementById('password').value;
+    }
+
+    await apiRequest(
+      isEdit ? `/api/admin/users/${userId}` : "/api/admin/users",
+      isEdit ? "PUT" : "POST",
+      payload
+    );
+
+    window.location.href = "/admin/users";
+  });
+</script>

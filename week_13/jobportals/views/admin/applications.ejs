@@ -1,0 +1,20 @@
+<h1 class="text-2xl font-bold mb-4">Applications</h1>
+
+<table class="w-full bg-white rounded shadow">
+  <thead class="bg-gray-100">
+    <tr>
+      <th class="p-2">Applicant</th>
+      <th class="p-2">Job</th>
+      <th class="p-2">Status</th>
+    </tr>
+  </thead>
+  <tbody>
+    <% applications.forEach(a => { %>
+      <tr class="border-t">
+        <td class="p-2"><%= a.user.name %></td>
+        <td class="p-2"><%= a.jobVacancy.title %></td>
+        <td class="p-2"><%= a.status %></td>
+      </tr>
+    <% }) %>
+  </tbody>
+</table>

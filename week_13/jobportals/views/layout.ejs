@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title><%= typeof title !== 'undefined' ? title : 'Job Vacancies' %></title>
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-100">
+
+  <nav class="bg-blue-600 text-white p-4">
+    <a href="/jobs" class="font-bold">Job Portal</a>
+    <span class="ml-4">
+      <a href="/auth/login">Login</a> |
+      <a href="/auth/register">Register</a>
+    </span>
+  </nav>
+
+  <main class="p-6">
+    <%- body %>
+  </main>
+
+</body>
+</html>

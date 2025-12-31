@@ -1,0 +1,65 @@
+<h1 class="text-2xl font-bold mb-4">
+  <%= vacancy ? "Edit Vacancy" : "Create Vacancy" %>
+</h1>
+
+<form id="vacancyForm" class="space-y-4">
+  <input class="border p-2 w-full" placeholder="Title" id="title"
+    value="<%= vacancy ? vacancy.title : '' %>" />
+
+  <input class="border p-2 w-full" placeholder="Company" id="company"
+    value="<%= vacancy ? vacancy.company : '' %>" />
+
+  <input class="border p-2 w-full" placeholder="Location" id="location"
+    value="<%= vacancy ? vacancy.location : '' %>" />
+
+  <textarea class="border p-2 w-full" placeholder="Description" id="description"><%= vacancy ? vacancy.description : '' %></textarea>
+
+  <textarea class="border p-2 w-full" placeholder="Requirements" id="requirements"><%= vacancy ? vacancy.requirements : '' %></textarea>
+
+  <input class="border p-2 w-full" placeholder="Salary" id="salary"
+    value="<%= vacancy ? vacancy.salary : '' %>" />
+
+  <select id="status" class="border p-2 w-full">
+    <option value="ACTIVE" <%= vacancy && vacancy.status === "ACTIVE" ? "selected" : "" %>>
+      ACTIVE
+    </option>
+    <option value="CLOSED" <%= vacancy && vacancy.status === "CLOSED" ? "selected" : "" %>>
+      CLOSED
+    </option>
+  </select>
+
+  <button class="bg-blue-600 text-white px-4 py-2 rounded">
+    Save
+  </button>
+</form>
+
+<script src="/javascripts/api.js"></script>
+<script>
+  // ⬇️ literal JS, super aman
+  const isEdit = <%= vacancy ? "true" : "false" %>;
+  const vacancyId = <%= vacancy ? vacancy.id : "null" %>;
+
+  document.getElementById("vacancyForm").addEventListener("submit", async (e) => {
+    e.preventDefault();
+
+    const payload = {
+      title: document.getElementById("title").value,
+      company: document.getElementById("company").value,
+      location: document.getElementById("location").value,
+      description: document.getElementById("description").value,
+      requirements: document.getElementById("requirements").value,
+      salary: document.getElementById("salary").value,
+      status: document.getElementById("status").value
+    };
+
+    await apiRequest(
+      isEdit
+        ? `/api/admin/vacancies/${vacancyId}`
+        : "/api/admin/vacancies",
+      isEdit ? "PUT" : "POST",
+      payload
+    );
+
+    window.location.href = "/admin/vacancies";
+  });
+</script>
