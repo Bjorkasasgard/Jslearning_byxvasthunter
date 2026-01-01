@@ -1,23 +1,174 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <title><%= typeof title !== 'undefined' ? title : 'Job Vacancies' %></title>
+  <meta charset="UTF-8" />
+  <title><%= title || "Job Portal" %></title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <!-- Tailwind -->
   <script src="https://cdn.tailwindcss.com"></script>
+
+  <!-- Lucide Icons -->
+  <script src="https://unpkg.com/lucide@latest"></script>
+
+  <style>
+    body {
+      background: radial-gradient(1200px circle at top, #eef2ff, #f8fafc);
+    }
+  </style>
 </head>
-<body class="bg-gray-100">
 
-  <nav class="bg-blue-600 text-white p-4">
-    <a href="/jobs" class="font-bold">Job Portal</a>
-    <span class="ml-4">
-      <a href="/auth/login">Login</a> |
-      <a href="/auth/register">Register</a>
-    </span>
-  </nav>
+<%
+  const isLoggedIn = !!currentUser;
+  const isAdmin = isLoggedIn && currentUser.role === 'ADMIN';
+  const isMember = isLoggedIn && currentUser.role === 'MEMBER';
+  const isAuthPage = typeof authPage !== 'undefined' && authPage;
+%>
 
-  <main class="p-6">
+<body class="min-h-screen text-slate-800">
+
+<% if (isAuthPage) { %>
+  <main class="min-h-screen flex items-center justify-center px-4">
     <%- body %>
   </main>
+<% } else { %>
+
+<div class="min-h-screen flex <%= isAdmin ? 'flex-row' : 'flex-col' %>">
+
+  <% if (isAdmin) { %>
+  <aside class="w-64 bg-white border-r hidden md:flex flex-col">
+    <div class="h-16 flex items-center px-6 font-semibold text-lg border-b">
+      Admin Panel
+    </div>
+
+    <nav class="flex-1 px-4 py-4 space-y-1 text-sm">
+      <a href="/admin/dashboard" class="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-indigo-50">
+        <i data-lucide="layout-dashboard" class="w-4 h-4"></i> Dashboard
+      </a>
+      <a href="/admin/users" class="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-indigo-50">
+        <i data-lucide="users" class="w-4 h-4"></i> Users
+      </a>
+      <a href="/admin/vacancies" class="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-indigo-50">
+        <i data-lucide="briefcase" class="w-4 h-4"></i> Vacancies
+      </a>
+      <a href="/admin/applications" class="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-indigo-50">
+        <i data-lucide="file-text" class="w-4 h-4"></i> Applications
+      </a>
+    </nav>
+
+    <div class="border-t px-4 py-3 text-sm">
+      <div class="text-slate-500 mb-2"><%= currentUser.name || "Admin" %></div>
+      <button id="logoutBtn" class="w-full px-3 py-2 rounded-lg bg-slate-900 text-white">
+        Logout
+      </button>
+    </div>
+  </aside>
+  <% } %>
+
+  <div class="flex-1 flex flex-col">
+
+    <% if (!isAdmin) { %>
+    <header class="sticky top-0 z-50">
+      <div class="bg-white/80 backdrop-blur border-b">
+        <div class="max-w-7xl mx-auto px-6 min-h-[72px] flex items-center gap-6">
+
+          <a href="/jobs" class="font-semibold text-lg shrink-0">
+            JobPortal
+          </a>
+
+          <div class="flex-1 flex justify-center">
+            <form action="/jobs" method="get" class="relative w-full max-w-xl">
+              <i data-lucide="search"
+                 class="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400 pointer-events-none"></i>
+              <input
+                name="q"
+                placeholder="Search jobs or companies"
+                class="w-full pl-9 pr-4 py-2 text-sm rounded-xl border
+                       focus:outline-none focus:ring-2 focus:ring-indigo-200"
+              />
+            </form>
+          </div>
+
+          <nav class="flex items-center gap-2 shrink-0">
+
+            <% if (isMember) { %>
+              <button class="relative w-10 h-10 flex items-center justify-center rounded-xl hover:bg-slate-100">
+                <i data-lucide="bell" class="w-5 h-5"></i>
+                <span class="absolute top-2 right-2 w-2 h-2 bg-red-500 rounded-full"></span>
+              </button>
+
+              <div class="relative">
+                <button id="userDropdownBtn"
+                  class="flex items-center gap-2 px-3 py-1.5 rounded-xl hover:bg-slate-100">
+                  <i data-lucide="user" class="w-5 h-5"></i>
+                  <span class="hidden sm:block font-medium"><%= currentUser.name %></span>
+                  <i data-lucide="chevron-down" class="w-4 h-4 text-slate-400"></i>
+                </button>
+
+                <div id="userDropdownMenu"
+                  class="absolute right-0 mt-2 w-48 bg-white border rounded-xl shadow-sm hidden z-50">
+                  <a href="/profile" class="block px-4 py-2 hover:bg-slate-100">Profile</a>
+                  <a href="/applications" class="block px-4 py-2 hover:bg-slate-100">My Applications</a>
+                  <button id="logoutBtn" class="w-full text-left px-4 py-2 hover:bg-slate-100">
+                    Logout
+                  </button>
+                </div>
+              </div>
+
+            <% } else if (!isLoggedIn) { %>
+              <a href="/jobs"
+                 class="hidden sm:inline-flex px-4 py-2 rounded-xl text-sm hover:bg-slate-100">
+                Browse jobs
+              </a>
+
+              <a href="/auth/login"
+                 class="inline-flex items-center gap-2 px-4 py-2 rounded-xl
+                        bg-indigo-600 text-white text-sm font-medium hover:bg-indigo-700">
+                <i data-lucide="log-in" class="w-4 h-4"></i>
+                Sign in
+              </a>
+            <% } %>
+
+          </nav>
+        </div>
+      </div>
+    </header>
+    <% } %>
+
+    <main class="<%= isAdmin
+      ? 'flex-1 p-6 bg-slate-50'
+      : 'flex-1 max-w-7xl mx-auto w-full px-6 py-10'
+    %>">
+      <%- body %>
+    </main>
+
+  </div>
+</div>
+
+<% } %>
+
+<script src="/javascripts/api.js"></script>
+<script src="/javascripts/auth.js"></script>
+
+<script>
+  lucide.createIcons();
+
+  document.addEventListener('DOMContentLoaded', () => {
+    const btn = document.getElementById('userDropdownBtn');
+    const menu = document.getElementById('userDropdownMenu');
+    if (btn && menu) {
+      btn.onclick = e => {
+        e.stopPropagation();
+        menu.classList.toggle('hidden');
+      };
+      document.onclick = e => {
+        if (!menu.contains(e.target) && !btn.contains(e.target)) {
+          menu.classList.add('hidden');
+        }
+      };
+    }
+  });
+</script>
 
 </body>
 </html>

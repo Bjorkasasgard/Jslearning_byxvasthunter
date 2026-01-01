@@ -66,7 +66,6 @@ module.exports = {
 
       res.status(201).json({
         message: "User registered successfully",
-        token,
         user: {
           id: user.id,
           name: user.name,
@@ -114,7 +113,6 @@ module.exports = {
 
       res.json({
         message: "Login successful",
-        token,
         user: {
           id: user.id,
           name: user.name,

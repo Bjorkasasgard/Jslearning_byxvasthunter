@@ -1,32 +1,98 @@
-<h1 class="text-2xl font-bold mb-4">User Management</h1>
+<h1 class="text-2xl font-bold mb-6">User Management</h1>
 
-<table class="w-full bg-white rounded shadow">
-    <thead class="bg-gray-100">
-        <tr>
-            <th class="p-2">ID</th>
-            <th class="p-2">Name</th>
-            <th class="p-2">Email</th>
-            <th class="p-2">Role</th>
-            <th><a href="/admin/users/create" class="text-blue-600">+ Create User</a>
-            </th>
-        </tr>
+<!-- FILTER -->
+<form class="mb-4 flex items-center gap-2" method="get" action="/admin/users">
+  <label class="text-sm text-slate-600">Filter by role:</label>
+
+  <select
+    name="role"
+    onchange="this.form.submit()"
+    class="border rounded-lg px-3 py-1.5 text-sm"
+  >
+    <option value="" <%= !filterRole ? 'selected' : '' %>>All</option>
+    <option value="ADMIN" <%= filterRole === 'ADMIN' ? 'selected' : '' %>>
+      ADMIN
+    </option>
+    <option value="MEMBER" <%= filterRole === 'MEMBER' ? 'selected' : '' %>>
+      MEMBER
+    </option>
+  </select>
+
+  <a
+    href="/admin/users/create"
+    class="ml-auto px-4 py-2 rounded-lg bg-indigo-600 text-white text-sm hover:bg-indigo-700 transition"
+  >
+    + Create User
+  </a>
+</form>
+
+<!-- TABLE -->
+<div class="bg-white rounded-xl shadow overflow-hidden">
+  <table class="w-full text-sm">
+    <thead class="bg-slate-100 text-slate-600">
+      <tr>
+        <th class="p-3 text-left">ID</th>
+        <th class="p-3 text-left">Name</th>
+        <th class="p-3 text-left">Email</th>
+        <th class="p-3 text-left">Role</th>
+        <th class="p-3 text-center">Actions</th>
+      </tr>
     </thead>
+
     <tbody>
-        <% users.forEach(u=> { %>
-            <tr class="border-t">
-                <td class="p-2">
-                    <%= u.id %>
-                </td>
-                <td class="p-2">
-                    <%= u.name %>
-                </td>
-                <td class="p-2">
-                    <%= u.email %>
-                </td>
-                <td class="p-2">
-                    <%= u.role %>
-                </td>
-            </tr>
-            <% }) %>
+      <% users.forEach(u => { %>
+        <tr class="border-t hover:bg-slate-50 transition">
+          <td class="p-3"><%= u.id %></td>
+          <td class="p-3"><%= u.name %></td>
+          <td class="p-3"><%= u.email %></td>
+          <td class="p-3">
+            <span class="px-2 py-1 rounded text-xs
+              <%= u.role === 'ADMIN'
+                ? 'bg-indigo-100 text-indigo-700'
+                : 'bg-slate-100 text-slate-700'
+              %>">
+              <%= u.role %>
+            </span>
+          </td>
+
+          <td class="p-3 text-center space-x-2">
+            <a
+              href="/admin/users/<%= u.id %>/edit"      
+              class="px-3 py-1.5 rounded bg-slate-100 hover:bg-slate-200 transition"
+            >
+              Edit
+            </a>
+            <button
+              onclick="deleteUser(<%= u.id %>)"
+              class="px-3 py-1.5 rounded bg-red-100 text-red-600 hover:bg-red-200 transition"
+            >
+              Delete
+            </button>
+          </td>
+        </tr>
+      <% }) %>
+
+      <% if (users.length === 0) { %>
+        <tr>
+          <td colspan="5" class="p-6 text-center text-slate-500">
+            No users found
+          </td>
+        </tr>
+      <% } %>
     </tbody>
-</table>
+  </table>
+</div>
+
+<script src="/javascripts/api.js"></script>
+<script>
+  async function deleteUser(id) {
+    if (!confirm("Are you sure you want to delete this user?")) return;
+
+    try {
+      await apiRequest(`/api/admin/users/${id}`, "DELETE");
+      window.location.reload();
+    } catch (err) {
+      alert("Failed to delete user");
+    }
+  }
+</script>

@@ -6,6 +6,7 @@ const router = express.Router();
 router.get("/login", (req, res) => {
   res.render("auth/login", {
     title: "Login",
+    authPage: true,
   });
 });
 
@@ -13,7 +14,9 @@ router.get("/login", (req, res) => {
 router.get("/register", (req, res) => {
   res.render("auth/register", {
     title: "Register",
+    authPage: true,
   });
 });
+
 
 module.exports = router;

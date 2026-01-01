@@ -6,6 +6,13 @@ var path = require("path");
 var cookieParser = require("cookie-parser");
 var logger = require("morgan");
 var expressLayouts = require("express-ejs-layouts");
+let csurf;
+try {
+   csurf = require('csurf');
+} catch (e) {
+   console.warn('csurf not installed; CSRF protection disabled for tests. Run `npm install csurf` to enable it.');
+   csurf = null;
+}
 
 var app = express();
 
@@ -26,9 +33,26 @@ app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, "public")));
 
+// attach current user to views when cookie/token present
+const { attachCurrentUser } = require('./middleware/viewAuth');
+app.use(attachCurrentUser);
+// lightweight alert middleware to surface ?success= / ?error= messages in UI
+app.use(require('./middleware/alerts'));
+// UI context: mark admin pages so sidebar is shown only there
+app.use(require('./middleware/uiContext'));
+
 /* ======================
    API ROUTES
 ====================== */
+// CSRF protection for API routes using cookie-based tokens (optional)
+if (csurf) {
+   app.use('/api', csurf({ cookie: true }));
+   app.use('/api/csrf', require('./routes/api/csrf'));
+} else {
+   // fallback csrf endpoint for testing when csurf not installed
+   app.get('/api/csrf', (req, res) => res.json({ csrfToken: '' }));
+}
+
 app.use("/api/auth", require("./routes/api/auth"));
 app.use("/api/vacancies", require("./routes/api/vacancies"));
 app.use("/api/admin", require("./routes/api/admin"));
@@ -40,6 +64,8 @@ app.use("/api/member", require("./routes/api/member"));
 app.use("/auth", require("./routes/public/auth"));
 app.use("/jobs", require("./routes/public/jobs"));
 app.use("/admin", require("./routes/public/admin"));
+app.use("/profile", require("./routes/public/profile"));
+app.use("/applications", require("./routes/public/applications"));
 
 /* ======================
    HOME REDIRECT
@@ -51,18 +77,9 @@ app.get("/", (req, res) => {
 /* ======================
    ERROR HANDLING
 ====================== */
-// 404
-app.use(function (req, res, next) {
-  next(createError(404));
-});
-
-// error handler
-app.use(function (err, req, res, next) {
-  res.locals.message = err.message;
-  res.locals.error = req.app.get("env") === "development" ? err : {};
-
-  res.status(err.status || 500);
-  res.render("error");
-});
+// 404 and global error handling
+const { notFound, errorHandler } = require('./middleware/error');
+app.use(notFound);
+app.use(errorHandler);
 
 module.exports = app;

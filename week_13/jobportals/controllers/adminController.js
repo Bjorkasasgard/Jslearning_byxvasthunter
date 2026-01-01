@@ -5,7 +5,9 @@ const bcrypt = require("bcrypt");
 module.exports = {
   // ===== USERS =====
   listUsers: async (req, res) => {
-    const users = await prisma.user.findMany();
+    const role = req.query.role;
+    const where = role ? { role } : undefined;
+    const users = await prisma.user.findMany({ where });
     res.json(users);
   },
 
@@ -29,11 +31,15 @@ module.exports = {
 
   updateUser: async (req, res) => {
     const id = Number(req.params.id);
-    const { name, email, role } = req.body;
+    const { name, email, role, password } = req.body;
+    const data = { name, email, role };
+    if (password) {
+      data.password = await bcrypt.hash(password, 10);
+    }
 
     const user = await prisma.user.update({
       where: { id },
-      data: { name, email, role },
+      data,
     });
 
     res.json(user);
@@ -41,8 +47,25 @@ module.exports = {
 
   deleteUser: async (req, res) => {
     const id = Number(req.params.id);
-    await prisma.user.delete({ where: { id } });
-    res.json({ message: "User deleted" });
+    try {
+      const createdVacancies = await prisma.jobVacancy.findMany({ where: { createdBy: id }, select: { id: true } });
+      const vacancyIds = createdVacancies.map(v => v.id);
+
+      await prisma.$transaction(async (tx) => {
+        if (vacancyIds.length) {
+          await tx.application.deleteMany({ where: { jobVacancyId: { in: vacancyIds } } });
+          await tx.jobVacancy.deleteMany({ where: { id: { in: vacancyIds } } });
+        }
+
+        await tx.application.deleteMany({ where: { userId: id } });
+        await tx.user.delete({ where: { id } });
+      });
+
+      res.json({ message: "User and related data deleted" });
+    } catch (err) {
+      console.error(err);
+      res.status(400).json({ message: 'Delete failed', error: err.message });
+    }
   },
 
   // ===== VACANCIES =====

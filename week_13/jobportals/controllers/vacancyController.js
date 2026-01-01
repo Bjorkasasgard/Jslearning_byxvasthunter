@@ -5,11 +5,12 @@ const prisma = require("../prisma/client");
 module.exports = {
   // PUBLIC JOB LIST
   publicList: async (req, res) => {
-    const { page = 1, limit = 10, status = "ACTIVE" } = req.query;
+    const { page = 1, limit = 10, status } = req.query;
     const skip = (page - 1) * limit;
+    const where = status ? { status } : undefined;
 
     const vacancies = await prisma.jobVacancy.findMany({
-      where: { status },
+      where,
       skip: Number(skip),
       take: Number(limit),
       orderBy: { createdAt: "desc" },

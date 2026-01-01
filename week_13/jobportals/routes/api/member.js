@@ -13,4 +13,7 @@ router.use(authenticateToken, requireMember);
 router.get("/applications", MemberController.myApplications);
 router.get("/applications/:id", MemberController.applicationDetail);
 
+// update own profile
+router.put('/profile', MemberController.updateProfile);
+
 module.exports = router;

@@ -1,43 +1,48 @@
-<h1 class="text-2xl font-bold mb-4">
-  <%= vacancy ? "Edit Vacancy" : "Create Vacancy" %>
-</h1>
+<h1 class="text-2xl font-bold mb-6"><%= vacancy && vacancy.id ? 'Edit Vacancy' : 'Create Vacancy' %></h1>
 
-<form id="vacancyForm" class="space-y-4">
-  <input class="border p-2 w-full" placeholder="Title" id="title"
-    value="<%= vacancy ? vacancy.title : '' %>" />
-
-  <input class="border p-2 w-full" placeholder="Company" id="company"
-    value="<%= vacancy ? vacancy.company : '' %>" />
-
-  <input class="border p-2 w-full" placeholder="Location" id="location"
-    value="<%= vacancy ? vacancy.location : '' %>" />
-
-  <textarea class="border p-2 w-full" placeholder="Description" id="description"><%= vacancy ? vacancy.description : '' %></textarea>
-
-  <textarea class="border p-2 w-full" placeholder="Requirements" id="requirements"><%= vacancy ? vacancy.requirements : '' %></textarea>
-
-  <input class="border p-2 w-full" placeholder="Salary" id="salary"
-    value="<%= vacancy ? vacancy.salary : '' %>" />
-
-  <select id="status" class="border p-2 w-full">
-    <option value="ACTIVE" <%= vacancy && vacancy.status === "ACTIVE" ? "selected" : "" %>>
-      ACTIVE
-    </option>
-    <option value="CLOSED" <%= vacancy && vacancy.status === "CLOSED" ? "selected" : "" %>>
-      CLOSED
-    </option>
-  </select>
-
-  <button class="bg-blue-600 text-white px-4 py-2 rounded">
-    Save
-  </button>
+<form id="vacancyForm" class="space-y-4 bg-white p-6 rounded-xl shadow max-w-2xl mx-auto">
+  <div>
+    <label class="block text-sm text-slate-600">Title</label>
+    <input id="title" name="title" class="border rounded-lg p-2.5 w-full" value="<%= vacancy?.title || '' %>" required />
+  </div>
+  <div>
+    <label class="block text-sm text-slate-600">Company</label>
+    <input id="company" name="company" class="border rounded-lg p-2.5 w-full" value="<%= vacancy?.company || '' %>" required />
+  </div>
+  <div>
+    <label class="block text-sm text-slate-600">Location</label>
+    <input id="location" name="location" class="border rounded-lg p-2.5 w-full" value="<%= vacancy?.location || '' %>" required />
+  </div>
+  <div>
+    <label class="block text-sm text-slate-600">Description</label>
+    <textarea id="description" name="description" class="border rounded-lg p-2.5 w-full" rows="3" required><%= vacancy?.description || '' %></textarea>
+  </div>
+  <div>
+    <label class="block text-sm text-slate-600">Requirements</label>
+    <textarea id="requirements" name="requirements" class="border rounded-lg p-2.5 w-full" rows="2" required><%= vacancy?.requirements || '' %></textarea>
+  </div>
+  <div>
+    <label class="block text-sm text-slate-600">Salary</label>
+    <input id="salary" name="salary" class="border rounded-lg p-2.5 w-full" value="<%= vacancy?.salary || '' %>" />
+  </div>
+  <div>
+    <label class="block text-sm text-slate-600">Status</label>
+    <select id="status" name="status" class="border rounded-lg p-2.5 w-full">
+      <option value="ACTIVE" <%= !vacancy || vacancy.status === 'ACTIVE' ? 'selected' : '' %>>ACTIVE</option>
+      <option value="CLOSED" <%= vacancy && vacancy.status === 'CLOSED' ? 'selected' : '' %>>CLOSED</option>
+    </select>
+  </div>
+  <div class="flex gap-3">
+    <button type="submit" class="bg-indigo-600 text-white px-4 py-2 rounded">Save</button>
+    <a href="/admin/vacancies" class="px-4 py-2 rounded border">Cancel</a>
+  </div>
 </form>
 
 <script src="/javascripts/api.js"></script>
 <script>
-  // ⬇️ literal JS, super aman
-  const isEdit = <%= vacancy ? "true" : "false" %>;
-  const vacancyId = <%= vacancy ? vacancy.id : "null" %>;
+  var vacancyData = <%- JSON.stringify(vacancy || {}) %>;
+  var isEdit = Boolean(vacancyData.id);
+  var vacancyId = vacancyData.id || null;
 
   document.getElementById("vacancyForm").addEventListener("submit", async (e) => {
     e.preventDefault();
