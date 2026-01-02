@@ -1,20 +1,213 @@
-<h1 class="text-2xl font-bold mb-4">Applications</h1>
+<h1 class="text-2xl font-semibold text-slate-800 mb-6">
+  Applications
+</h1>
 
-<table class="w-full bg-white rounded shadow">
-  <thead class="bg-gray-100">
+<div class="bg-white rounded-xl shadow overflow-hidden">
+<table class="w-full text-sm">
+  <thead class="bg-slate-100 text-slate-600">
     <tr>
-      <th class="p-2">Applicant</th>
-      <th class="p-2">Job</th>
-      <th class="p-2">Status</th>
+      <th class="p-3 text-left">Applicant</th>
+      <th class="p-3 text-left">Email</th>
+      <th class="p-3 text-left">Phone</th>
+      <th class="p-3 text-left">Job</th>
+      <th class="p-3 text-center">Resume</th>
+      <th class="p-3 text-left">About</th>
+      <th class="p-3 text-left">Q & A</th>
+      <th class="p-3 text-center">Status</th>
+      <th class="p-3 text-center">Action</th>
     </tr>
   </thead>
-  <tbody>
-    <% applications.forEach(a => { %>
-      <tr class="border-t">
-        <td class="p-2"><%= a.user.name %></td>
-        <td class="p-2"><%= a.jobVacancy.title %></td>
-        <td class="p-2"><%= a.status %></td>
-      </tr>
-    <% }) %>
+
+  <tbody class="divide-y">
+  <% applications.forEach(a => {
+
+    /* ========= RESUME ========= */
+    const resumeMatch = (a.coverLetter || '').match(/Resume:\s*(\S+)/i);
+    const resumeLink =
+      a.resumeLink ||
+      (resumeMatch ? resumeMatch[1] : (a.user?.resume || null));
+
+    /* ========= ABOUT (CLEAN) ========= */
+    const rawCover = a.coverLetter || '';
+    const stopPattern = /^(Location:|Resume:|Questions?:|Answers?:)/i;
+
+    const aboutText = rawCover
+      .split(/\r?\n/)
+      .map(l => l.trim())
+      .filter(l => l && !stopPattern.test(l))
+      .join('\n');
+
+    const shortAbout =
+      aboutText.length > 100 ? aboutText.slice(0, 100) + '…' : aboutText;
+
+    /* ========= Q&A ========= */
+    const qs = a.jobVacancy?.questions || [];
+    const answers = a.answers || [];
+  %>
+
+  <tr class="align-top hover:bg-slate-50 transition">
+
+    <!-- APPLICANT -->
+    <td class="p-3 font-medium text-slate-800">
+      <%= a.user?.name || '—' %>
+    </td>
+
+    <td class="p-3 text-slate-700">
+      <%= a.user?.email || '—' %>
+    </td>
+
+    <td class="p-3 text-slate-700">
+      <%= a.user?.phone || '—' %>
+    </td>
+
+    <!-- JOB -->
+    <td class="p-3 text-slate-800">
+      <%= a.jobVacancy?.title || '—' %>
+    </td>
+
+    <!-- RESUME -->
+    <td class="p-3 text-center">
+      <% if (resumeLink) { %>
+        <a href="<%= resumeLink %>" target="_blank"
+           class="text-indigo-600 hover:underline font-medium">
+          View
+        </a>
+      <% } else { %>
+        <span class="text-slate-400">—</span>
+      <% } %>
+    </td>
+
+    <!-- ABOUT -->
+    <td class="p-3 max-w-xs">
+      <% if (!aboutText) { %>
+        <span class="text-slate-400">—</span>
+      <% } else { %>
+        <details class="group">
+          <summary class="flex items-center gap-2 cursor-pointer text-indigo-600">
+            <!-- icon -->
+            <svg class="w-4 h-4 group-open:rotate-90 transition"
+                 fill="none" stroke="currentColor" stroke-width="2"
+                 viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round"
+                    d="M9 5l7 7-7 7" />
+            </svg>
+            <span class="truncate"><%= shortAbout %></span>
+          </summary>
+
+          <div class="mt-2 whitespace-pre-wrap text-slate-700 text-xs">
+            <%= aboutText %>
+          </div>
+        </details>
+      <% } %>
+    </td>
+
+    <!-- QUESTIONS & ANSWERS -->
+    <td class="p-3 max-w-xs">
+      <% if (qs.length === 0) { %>
+        <span class="text-slate-400">—</span>
+      <% } else { %>
+        <details class="group">
+          <summary class="flex items-center gap-2 cursor-pointer text-slate-700">
+            <!-- icon -->
+            <svg class="w-4 h-4 group-open:rotate-90 transition"
+                 fill="none" stroke="currentColor" stroke-width="2"
+                 viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round"
+                    d="M9 5l7 7-7 7" />
+            </svg>
+            <span class="font-medium">
+              View Q & A (<%= qs.length %>)
+            </span>
+          </summary>
+
+          <div class="mt-2 space-y-3 text-xs text-slate-700">
+            <% qs.forEach((q, i) => { %>
+              <div>
+                <p class="font-semibold">Q<%= i + 1 %>: <%= q %></p>
+                <p class="whitespace-pre-wrap text-slate-600">
+                  <%= answers[i] || '—' %>
+                </p>
+              </div>
+            <% }) %>
+          </div>
+        </details>
+      <% } %>
+    </td>
+
+    <!-- STATUS -->
+    <td class="p-3 text-center">
+      <select
+        id="status-<%= a.id %>"
+        onchange="updateStatus(<%= a.id %>, this)"
+        class="border rounded-lg px-2 py-1 text-xs focus:ring-2 focus:ring-indigo-200">
+        <% ['PENDING','REVIEWED','ACCEPTED','REJECTED'].forEach(s => { %>
+          <option value="<%= s %>" <%= a.status === s ? 'selected' : '' %>>
+            <%= s %>
+          </option>
+        <% }) %>
+      </select>
+    </td>
+
+    <!-- ACTION -->
+    <td class="p-3 text-center">
+      <button
+        onclick="saveStatus(<%= a.id %>)"
+        id="save-<%= a.id %>"
+        class="px-3 py-1.5 rounded-lg bg-emerald-600 text-white text-xs hover:bg-emerald-700">
+        Save
+      </button>
+    </td>
+
+  </tr>
+  <% }) %>
+
+  <% if (applications.length === 0) { %>
+    <tr>
+      <td colspan="9" class="p-6 text-center text-slate-500">
+        No applications found
+      </td>
+    </tr>
+  <% } %>
   </tbody>
 </table>
+</div>
+
+<script>
+  function updateStatus(appId, selectEl) {
+    selectEl.dataset.pendingSave = 'true';
+  }
+
+  async function saveStatus(appId) {
+    const select = document.getElementById(`status-${appId}`);
+    const button = document.getElementById(`save-${appId}`);
+
+    if (!select) return alert('Status selector not found.');
+
+    const status = select.value;
+    if (!status) return alert('Please choose a status first.');
+
+    select.disabled = true;
+    if (button) {
+      button.disabled = true;
+      button.textContent = 'Saving...';
+    }
+
+    try {
+      const updated = await apiRequest(`/api/admin/applications/${appId}`, 'PUT', { status });
+      if (updated?.status === status) {
+        alert('Status saved and applicant notified.');
+        select.dataset.pendingSave = 'false';
+      } else {
+        alert('Could not save status. Please try again.');
+      }
+    } catch (err) {
+      alert(err?.message || 'Failed to save status.');
+    } finally {
+      select.disabled = false;
+      if (button) {
+        button.disabled = false;
+        button.textContent = 'Save';
+      }
+    }
+  }
+</script>

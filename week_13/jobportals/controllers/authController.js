@@ -88,9 +88,10 @@ module.exports = {
         return res.status(400).json({ message: "Email and password required" });
       }
 
-      const user = await prisma.user.findUnique({
-        where: { email },
-      });
+      console.log('[authController.login] attempt email=', email);
+      const user = await prisma.user.findUnique({ where: { email } });
+
+      console.log('[authController.login] user found=', !!user, user ? { id: user.id, email: user.email, name: user.name } : null);
 
       if (!user) {
         return res.status(401).json({ message: "Invalid credentials" });

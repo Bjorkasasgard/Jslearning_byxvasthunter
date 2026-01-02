@@ -15,6 +15,9 @@ model User {
   role      Role      @default(MEMBER)
   createdAt DateTime  @default(now())
   updatedAt DateTime  @updatedAt
+  city        String?
+  resume      String?
+  phone       String?
   
   createdVacancies JobVacancy[]
   applications     Application[]
@@ -33,6 +36,8 @@ model JobVacancy {
   description  String
   requirements String
   salary       String?
+  jobType      JobType  @default(FULLTIME)
+  questions    Json?
   status       String    @default("ACTIVE") // ACTIVE or CLOSED
   createdBy    Int
   createdAt    DateTime  @default(now())
@@ -42,11 +47,22 @@ model JobVacancy {
   applications Application[]
 }
 
+enum JobType {
+  FULLTIME
+  PARTTIME
+  REMOTE
+  HYBRID
+  CONTRACT
+}
+
 model Application {
   id           Int       @id @default(autoincrement())
   userId       Int
   jobVacancyId Int
   coverLetter  String?
+  answers      Json?
+  resumeLink   String?
+  notificationRead Boolean @default(false)
   status       String    @default("PENDING") // PENDING, REVIEWED, ACCEPTED, REJECTED
   createdAt    DateTime  @default(now())
   updatedAt    DateTime  @updatedAt

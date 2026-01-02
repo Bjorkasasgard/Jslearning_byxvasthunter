@@ -15,7 +15,8 @@ router.get('/', attachCurrentUser, asyncHandler(async (req, res) => {
       orderBy: { createdAt: 'desc' },
     });
   }
-  res.render('profile', {
+
+  res.render('applications', {
     title: 'My Applications',
     current,
     applications,

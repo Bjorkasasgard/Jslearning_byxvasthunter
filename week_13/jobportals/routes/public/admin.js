@@ -23,6 +23,24 @@ router.get(
     const jobsCount = await prisma.jobVacancy.count();
     const appsCount = await prisma.application.count();
 
+    // admin-specific stats (vacancies created by this admin)
+    const adminId = Number(res.locals.currentUser?.id || req.user?.id || 0);
+    let adminStats = {
+      myVacancies: 0,
+      myActive: 0,
+      myClosed: 0,
+      myApplications: 0,
+    };
+
+    if (adminId > 0) {
+      // Only count vacancies/applications created by this admin
+      adminStats.myVacancies = await prisma.jobVacancy.count({ where: { createdBy: adminId } });
+      adminStats.myActive = await prisma.jobVacancy.count({ where: { createdBy: adminId, status: 'ACTIVE' } });
+      adminStats.myClosed = await prisma.jobVacancy.count({ where: { createdBy: adminId, status: 'CLOSED' } });
+      // count applications for vacancies created by this admin
+      adminStats.myApplications = await prisma.application.count({ where: { jobVacancy: { createdBy: adminId } } });
+    }
+
     res.render("admin/dashboard", {
       title: "Admin Dashboard",
       stats: {
@@ -30,6 +48,8 @@ router.get(
         jobsCount,
         appsCount,
       },
+      adminStats,
+      adminId,
     });
   })
 );
@@ -58,8 +78,15 @@ router.get(
   requireAdminView,
   asyncHandler(async (req, res) => {
     const status = req.query.status;
-    const where = status ? { status } : undefined;
-    const vacancies = await prisma.jobVacancy.findMany({ where });
+    // show only vacancies created by the current admin user
+    const adminId = Number(res.locals.currentUser?.id || req.user?.id || 0);
+    let vacancies = [];
+    if (adminId > 0) {
+      const where = { createdBy: adminId, ...(status ? { status } : {}) };
+      vacancies = await prisma.jobVacancy.findMany({ where, orderBy: { createdAt: 'desc' } });
+    } else {
+      vacancies = [];
+    }
     res.render("admin/vacancies", {
       title: "Manage Vacancies",
       vacancies,
@@ -74,8 +101,11 @@ router.get(
   authenticateView,
   requireAdminView,
   asyncHandler(async (req, res) => {
+    const adminId = Number(res.locals.currentUser?.id || req.user?.id || 0);
     const applications = await prisma.application.findMany({
+      where: { jobVacancy: { createdBy: adminId } },
       include: { user: true, jobVacancy: true },
+      orderBy: { createdAt: 'desc' },
     });
 
     res.render("admin/applications", {

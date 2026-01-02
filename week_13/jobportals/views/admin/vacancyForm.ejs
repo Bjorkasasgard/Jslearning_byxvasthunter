@@ -1,70 +1,266 @@
-<h1 class="text-2xl font-bold mb-6"><%= vacancy && vacancy.id ? 'Edit Vacancy' : 'Create Vacancy' %></h1>
+<h1 class="text-2xl font-bold mb-6">
+  <%= vacancy && vacancy.id ? 'Edit Vacancy' : 'Create Vacancy' %>
+</h1>
 
-<form id="vacancyForm" class="space-y-4 bg-white p-6 rounded-xl shadow max-w-2xl mx-auto">
+<form id="vacancyForm" class="space-y-5 bg-white p-6 rounded-xl shadow max-w-2xl mx-auto">
+
+  <!-- GLOBAL ERROR -->
+  <div
+    id="formError"
+    class="hidden text-sm bg-red-50 text-red-700 border border-red-200 rounded-lg p-3"
+  ></div>
+
+  <!-- JOB TITLE -->
   <div>
-    <label class="block text-sm text-slate-600">Title</label>
-    <input id="title" name="title" class="border rounded-lg p-2.5 w-full" value="<%= vacancy?.title || '' %>" required />
+    <label class="block text-sm font-medium text-slate-700">Job Title</label>
+    <input
+      id="title"
+      class="mt-1 border rounded-lg p-2.5 w-full focus:ring-2 focus:ring-indigo-200"
+      placeholder="e.g. Frontend Developer"
+      value="<%= vacancy?.title || '' %>"
+      required
+    />
   </div>
+
+  <!-- COMPANY -->
   <div>
-    <label class="block text-sm text-slate-600">Company</label>
-    <input id="company" name="company" class="border rounded-lg p-2.5 w-full" value="<%= vacancy?.company || '' %>" required />
+    <label class="block text-sm font-medium text-slate-700">Company</label>
+    <input
+      id="company"
+      class="mt-1 border rounded-lg p-2.5 w-full focus:ring-2 focus:ring-indigo-200"
+      placeholder="e.g. PT Teknologi Nusantara"
+      value="<%= vacancy?.company || '' %>"
+      required
+    />
   </div>
+
+  <!-- LOCATION -->
   <div>
-    <label class="block text-sm text-slate-600">Location</label>
-    <input id="location" name="location" class="border rounded-lg p-2.5 w-full" value="<%= vacancy?.location || '' %>" required />
+    <label class="block text-sm font-medium text-slate-700">Location</label>
+    <input
+      id="location"
+      class="mt-1 border rounded-lg p-2.5 w-full focus:ring-2 focus:ring-indigo-200"
+      placeholder="e.g. Jakarta / Remote"
+      value="<%= vacancy?.location || '' %>"
+      required
+    />
   </div>
+
+  <!-- SALARY -->
   <div>
-    <label class="block text-sm text-slate-600">Description</label>
-    <textarea id="description" name="description" class="border rounded-lg p-2.5 w-full" rows="3" required><%= vacancy?.description || '' %></textarea>
+    <label class="block text-sm font-medium text-slate-700">Salary</label>
+    <input
+      id="salary"
+      class="mt-1 border rounded-lg p-2.5 w-full focus:ring-2 focus:ring-indigo-200"
+      placeholder="e.g. Rp 8.000.000 – Rp 12.000.000"
+      value="<%= vacancy?.salary || '' %>"
+    />
+    <p class="text-xs text-slate-500 mt-1">
+      Optional, but increases applicant interest
+    </p>
   </div>
+
+  <!-- DESCRIPTION -->
   <div>
-    <label class="block text-sm text-slate-600">Requirements</label>
-    <textarea id="requirements" name="requirements" class="border rounded-lg p-2.5 w-full" rows="2" required><%= vacancy?.requirements || '' %></textarea>
+    <label class="block text-sm font-medium text-slate-700">
+      Job Description
+    </label>
+    <textarea
+      id="description"
+      rows="4"
+      class="mt-1 border rounded-lg p-2.5 w-full focus:ring-2 focus:ring-indigo-200"
+      placeholder="Describe responsibilities, environment, and goals"
+      required
+    ><%= vacancy?.description || '' %></textarea>
   </div>
+
+  <!-- REQUIREMENTS -->
   <div>
-    <label class="block text-sm text-slate-600">Salary</label>
-    <input id="salary" name="salary" class="border rounded-lg p-2.5 w-full" value="<%= vacancy?.salary || '' %>" />
+    <label class="block text-sm font-medium text-slate-700">
+      Requirements
+    </label>
+    <textarea
+      id="requirements"
+      rows="3"
+      class="mt-1 border rounded-lg p-2.5 w-full focus:ring-2 focus:ring-indigo-200"
+      placeholder="Skills, experience, tools"
+      required
+    ><%= vacancy?.requirements || '' %></textarea>
   </div>
+
+  <!-- JOB TYPE -->
   <div>
-    <label class="block text-sm text-slate-600">Status</label>
-    <select id="status" name="status" class="border rounded-lg p-2.5 w-full">
-      <option value="ACTIVE" <%= !vacancy || vacancy.status === 'ACTIVE' ? 'selected' : '' %>>ACTIVE</option>
-      <option value="CLOSED" <%= vacancy && vacancy.status === 'CLOSED' ? 'selected' : '' %>>CLOSED</option>
+    <label class="block text-sm font-medium text-slate-700">Job Type</label>
+    <select id="jobType" class="mt-1 border rounded-lg p-2.5 w-full">
+      <% ['FULLTIME','PARTTIME','REMOTE','HYBRID','CONTRACT'].forEach(t => { %>
+        <option value="<%= t %>" <%= vacancy?.jobType === t ? 'selected' : '' %>>
+          <%= t %>
+        </option>
+      <% }) %>
     </select>
   </div>
-  <div class="flex gap-3">
-    <button type="submit" class="bg-indigo-600 text-white px-4 py-2 rounded">Save</button>
-    <a href="/admin/vacancies" class="px-4 py-2 rounded border">Cancel</a>
+
+  <!-- STATUS -->
+  <div>
+    <label class="block text-sm font-medium text-slate-700">Status</label>
+    <select id="status" class="mt-1 border rounded-lg p-2.5 w-full">
+      <option value="ACTIVE" <%= vacancy?.status !== 'CLOSED' ? 'selected' : '' %>>
+        ACTIVE
+      </option>
+      <option value="CLOSED" <%= vacancy?.status === 'CLOSED' ? 'selected' : '' %>>
+        CLOSED
+      </option>
+    </select>
+  </div>
+
+  <!-- QUESTIONS -->
+  <div>
+    <label class="block text-sm font-medium text-slate-700">
+      Questions for Applicants
+    </label>
+    <p class="text-xs text-slate-500 mb-2">
+      These questions will be shown during the application process.
+    </p>
+
+    <div id="questionsWrapper" class="space-y-2">
+      <% 
+        let questionsArr = [];
+        try {
+          if (vacancy?.questions) {
+            questionsArr = Array.isArray(vacancy.questions) ? vacancy.questions : JSON.parse(vacancy.questions);
+          }
+        } catch (e) { questionsArr = []; }
+        if (questionsArr.length === 0) { questionsArr = ['']; }
+        questionsArr.forEach(q => { %>
+          <div class="questionRow flex items-center gap-2">
+            <input
+              class="questionInput border rounded-lg p-2.5 flex-1"
+              placeholder="e.g. Tell us about your experience with React"
+              value="<%= q %>"
+            />
+            <button type="button" class="removeQuestion text-sm text-red-600 hover:underline">Remove</button>
+          </div>
+      <% }) %>
+    </div>
+
+    <button
+      type="button"
+      id="addQuestion"
+      class="mt-2 text-sm text-indigo-600 hover:underline"
+    >
+      + Add question
+    </button>
+  </div>
+
+  <!-- ACTIONS -->
+  <div class="flex gap-3 pt-4">
+    <button
+      id="submitBtn"
+      type="submit"
+      class="bg-indigo-600 text-white px-4 py-2 rounded-lg hover:bg-indigo-700 transition font-semibold"
+    >
+      Save Vacancy
+    </button>
+
+    <a href="/admin/vacancies" class="px-4 py-2 rounded-lg border">
+      Cancel
+    </a>
   </div>
 </form>
 
 <script src="/javascripts/api.js"></script>
+
 <script>
-  var vacancyData = <%- JSON.stringify(vacancy || {}) %>;
-  var isEdit = Boolean(vacancyData.id);
-  var vacancyId = vacancyData.id || null;
+  const form = document.getElementById('vacancyForm');
+  const errorBox = document.getElementById('formError');
+  const submitBtn = document.getElementById('submitBtn');
 
-  document.getElementById("vacancyForm").addEventListener("submit", async (e) => {
+  const titleEl = document.getElementById('title');
+  const companyEl = document.getElementById('company');
+  const locationEl = document.getElementById('location');
+  const descriptionEl = document.getElementById('description');
+  const requirementsEl = document.getElementById('requirements');
+  const salaryEl = document.getElementById('salary');
+  const jobTypeEl = document.getElementById('jobType');
+  const statusEl = document.getElementById('status');
+
+  document.getElementById('addQuestion').addEventListener('click', () => {
+    const wrapper = document.createElement('div');
+    wrapper.className = 'questionRow flex items-center gap-2';
+    const input = document.createElement('input');
+    input.className = 'questionInput border rounded-lg p-2.5 flex-1';
+    input.placeholder = 'Write new question for applicants';
+    const btn = document.createElement('button');
+    btn.type = 'button';
+    btn.className = 'removeQuestion text-sm text-red-600 hover:underline';
+    btn.textContent = 'Remove';
+    btn.addEventListener('click', () => wrapper.remove());
+    wrapper.appendChild(input);
+    wrapper.appendChild(btn);
+    document.getElementById('questionsWrapper').appendChild(wrapper);
+  });
+
+  // wire existing remove buttons
+  document.querySelectorAll('.removeQuestion').forEach(btn => {
+    btn.addEventListener('click', (e) => {
+      e.target.closest('.questionRow')?.remove();
+    });
+  });
+
+  function safeTrim(el) {
+    return el && el.value ? el.value.trim() : '';
+  }
+
+  form.addEventListener('submit', async (e) => {
     e.preventDefault();
+    errorBox.classList.add('hidden');
 
-    const payload = {
-      title: document.getElementById("title").value,
-      company: document.getElementById("company").value,
-      location: document.getElementById("location").value,
-      description: document.getElementById("description").value,
-      requirements: document.getElementById("requirements").value,
-      salary: document.getElementById("salary").value,
-      status: document.getElementById("status").value
-    };
+    const questions = [...document.querySelectorAll('.questionInput')]
+      .map(i => i.value.trim())
+      .filter(Boolean);
 
-    await apiRequest(
-      isEdit
-        ? `/api/admin/vacancies/${vacancyId}`
-        : "/api/admin/vacancies",
-      isEdit ? "PUT" : "POST",
-      payload
-    );
+    if (!safeTrim(titleEl) || !safeTrim(companyEl) || !safeTrim(locationEl)) {
+      errorBox.textContent = 'Please fill all required fields.';
+      errorBox.classList.remove('hidden');
+      return;
+    }
 
-    window.location.href = "/admin/vacancies";
+    if (questions.length === 0) {
+      errorBox.textContent = 'Please add at least one question for applicants.';
+      errorBox.classList.remove('hidden');
+      return;
+    }
+
+    submitBtn.disabled = true;
+    submitBtn.textContent = 'Saving...';
+
+    try {
+      const payload = {
+        title: safeTrim(titleEl),
+        company: safeTrim(companyEl),
+        location: safeTrim(locationEl),
+        description: safeTrim(descriptionEl),
+        requirements: safeTrim(requirementsEl),
+        salary: safeTrim(salaryEl),
+        jobType: jobTypeEl.value,
+        status: statusEl.value,
+        questions
+      };
+
+      await apiRequest(
+        "<%= vacancy?.id ? `/api/admin/vacancies/${vacancy.id}` : '/api/admin/vacancies' %>",
+        "<%= vacancy?.id ? 'PUT' : 'POST' %>",
+        payload
+      );
+
+      window.location.href = '/admin/vacancies';
+
+    } catch (err) {
+      errorBox.textContent = err.message || 'Terjadi kesalahan, coba lagi.';
+      errorBox.classList.remove('hidden');
+    } finally {
+      submitBtn.disabled = false;
+      submitBtn.textContent = 'Save Vacancy';
+    }
   });
 </script>

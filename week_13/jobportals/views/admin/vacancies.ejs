@@ -37,6 +37,7 @@
       <tr>
         <th class="p-3 text-left">Title</th>
         <th class="p-3 text-left">Company</th>
+        <th class="p-3 text-left">Type</th>
         <th class="p-3 text-left">Location</th>
         <th class="p-3 text-left">Status</th>
         <th class="p-3 text-center">Actions</th>
@@ -48,6 +49,7 @@
         <tr class="border-t hover:bg-slate-50 transition">
           <td class="p-3 font-medium"><%= v.title %></td>
           <td class="p-3"><%= v.company %></td>
+          <td class="p-3"><%= v.jobType || '-' %></td>
           <td class="p-3"><%= v.location %></td>
           <td class="p-3">
             <span class="px-2 py-1 rounded text-xs
@@ -79,7 +81,7 @@
 
       <% if (vacancies.length === 0) { %>
         <tr>
-          <td colspan="5" class="p-6 text-center text-slate-500">
+          <td colspan="6" class="p-6 text-center text-slate-500">
             No vacancies found
           </td>
         </tr>

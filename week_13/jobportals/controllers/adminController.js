@@ -75,11 +75,23 @@ module.exports = {
   },
 
   createVacancy: async (req, res) => {
-    const data = req.body;
+
+    // Only pass supported fields to Prisma. Some clients send `questions` array
+    // which is not part of the JobVacancy model (stored separately or not at all),
+    // so strip it out to avoid Prisma validation errors.
+    const { questions, ...payload } = req.body || {};
 
     const vacancy = await prisma.jobVacancy.create({
       data: {
-        ...data,
+        title: payload.title,
+        company: payload.company,
+        location: payload.location,
+        description: payload.description,
+        requirements: payload.requirements,
+        salary: payload.salary,
+        jobType: payload.jobType,
+        questions: questions && Array.isArray(questions) ? questions : [],
+        status: payload.status,
         createdBy: req.user.id,
       },
     });
@@ -90,9 +102,21 @@ module.exports = {
   updateVacancy: async (req, res) => {
     const id = Number(req.params.id);
 
+    const { questions, ...payload } = req.body || {};
+
     const vacancy = await prisma.jobVacancy.update({
       where: { id },
-      data: req.body,
+      data: {
+        title: payload.title,
+        company: payload.company,
+        location: payload.location,
+        description: payload.description,
+        requirements: payload.requirements,
+        salary: payload.salary,
+        jobType: payload.jobType,
+        questions: questions && Array.isArray(questions) ? questions : [],
+        status: payload.status,
+      },
     });
 
     res.json(vacancy);
@@ -100,8 +124,16 @@ module.exports = {
 
   deleteVacancy: async (req, res) => {
     const id = Number(req.params.id);
-    await prisma.jobVacancy.delete({ where: { id } });
-    res.json({ message: "Vacancy deleted" });
+    try {
+      await prisma.$transaction(async (tx) => {
+        await tx.application.deleteMany({ where: { jobVacancyId: id } });
+        await tx.jobVacancy.delete({ where: { id } });
+      });
+      res.json({ message: "Vacancy deleted" });
+    } catch (err) {
+      console.error(err);
+      res.status(400).json({ message: 'Delete failed', error: err.message });
+    }
   },
 
   // ===== APPLICATIONS =====
@@ -132,7 +164,7 @@ module.exports = {
 
     const app = await prisma.application.update({
       where: { id },
-      data: { status },
+      data: { status, notificationRead: false },
     });
 
     res.json(app);

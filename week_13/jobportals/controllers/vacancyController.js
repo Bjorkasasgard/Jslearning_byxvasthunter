@@ -48,24 +48,53 @@ module.exports = {
   // APPLY JOB (MEMBER)
   apply: async (req, res) => {
     const jobVacancyId = Number(req.params.id);
-    const { coverLetter } = req.body;
+    const { coverLetter, answers, resumeLink } = req.body;
 
     try {
-      const application = await prisma.application.create({
-        data: {
-          userId: req.user.id,
-          jobVacancyId,
-          coverLetter,
-        },
-      });
+      // ensure vacancy exists and is open
+      const vacancy = await prisma.jobVacancy.findUnique({ where: { id: jobVacancyId } });
+      if (!vacancy) return res.status(404).json({ message: 'Vacancy not found' });
+      if (vacancy.status === 'CLOSED') return res.status(400).json({ message: 'Cannot apply to a closed vacancy' });
+
+      const baseData = {
+        userId: req.user.id,
+        jobVacancyId,
+        coverLetter,
+        answers: answers && Array.isArray(answers) ? answers : undefined,
+      };
+
+      // attach resumeLink only when provided
+      if (resumeLink) baseData.resumeLink = resumeLink;
+
+      let application;
+      try {
+        application = await prisma.application.create({ data: baseData });
+      } catch (err) {
+        // If schema is not migrated (no resumeLink column), retry without it
+        const msg = err?.message || '';
+        const missingResumeCol = msg.includes('resumeLink') || msg.includes('ResumeLink') || msg.includes('no such column') || msg.includes('Unknown arg `resumeLink`');
+        if (missingResumeCol && baseData.resumeLink) {
+          const { resumeLink: _, ...fallbackData } = baseData;
+          application = await prisma.application.create({ data: fallbackData });
+          console.warn('[vacancyController.apply] resumeLink column missing; application saved without resumeLink. Run prisma migrate.');
+        } else {
+          throw err;
+        }
+      }
 
       res.status(201).json({
         message: "Application submitted",
         application,
       });
     } catch (err) {
+      // Unique constraint duplicate apply
+      if (err?.code === 'P2002') {
+        return res.status(400).json({ message: "You already applied to this job" });
+      }
+
+      console.error('[vacancyController.apply] submit failed:', err);
       res.status(400).json({
-        message: "You already applied to this job",
+        message: err?.message || "Failed to submit application",
       });
     }
   },
