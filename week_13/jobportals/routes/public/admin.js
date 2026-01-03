@@ -86,7 +86,7 @@ router.get(
       vacancies = await prisma.jobVacancy.findMany({ where, orderBy: { createdAt: 'desc' } });
     } else {
       vacancies = [];
-    }
+    } 
     res.render("admin/vacancies", {
       title: "Manage Vacancies",
       vacancies,

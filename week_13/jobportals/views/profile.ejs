@@ -55,11 +55,11 @@
     </button>
   </div>
 
-  <!-- VISIBILITY INFO -->
+  <!-- VISIBILITY INFO
   <div class="flex items-center gap-3 bg-green-50 border border-green-200 text-green-800 px-5 py-4 rounded-md">
     <i data-lucide="eye" class="w-5 h-5"></i>
     <span class="font-medium">Employers can find your profile</span>
-  </div>
+  </div> -->
 
   <!-- EDIT PROFILE -->
   <form id="profileForm" class="hidden max-w-xl space-y-6">
@@ -143,12 +143,42 @@
       <span id="resumeStatus" class="text-sm text-slate-500"></span>
     </div>
 
+    <% if (current.resume) { %>
+      <div class="flex items-center gap-3 text-sm bg-slate-50 border border-slate-200 rounded-lg px-4 py-3">
+        <i data-lucide="file" class="w-4 h-4 text-slate-500"></i>
+        <a href="<%= current.resume %>" target="_blank" class="text-indigo-600 font-medium hover:underline">
+          View my resume
+        </a>
+        <span class="text-slate-400 text-xs">(opens in new tab)</span>
+      </div>
+    <% } else { %>
+      <div class="text-sm text-amber-700 bg-amber-50 border border-amber-200 rounded-lg px-4 py-3">
+        No resume uploaded yet. Upload one to enable quick apply.
+      </div>
+    <% } %>
+
   </div>
 
 </div>
 
 <% } %>
 </section>
+
+  <!-- User dialogue overlay -->
+  <div id="userDialog" class="fixed inset-0 bg-slate-900/40 hidden items-center justify-center z-50">
+    <div class="bg-white rounded-xl shadow-xl max-w-md w-full mx-4 p-6 space-y-4 border border-slate-100">
+      <div class="flex items-start gap-3">
+        <div id="userDialogBadge" class="w-10 h-10 rounded-full flex items-center justify-center text-base font-semibold bg-blue-100 text-blue-700 border border-blue-200">i</div>
+        <div class="space-y-1">
+          <p id="userDialogTitle" class="text-lg font-semibold text-slate-900">Dialog title</p>
+          <p id="userDialogBody" class="text-sm text-slate-600 leading-relaxed">Dialog message</p>
+        </div>
+      </div>
+      <div class="flex justify-end gap-3">
+        <button id="userDialogClose" class="px-4 py-2 rounded-md border border-slate-200 text-slate-700 hover:bg-slate-50">Close</button>
+      </div>
+    </div>
+  </div>
 
 <script>
 document.addEventListener('DOMContentLoaded', () => {
@@ -158,6 +188,38 @@ document.addEventListener('DOMContentLoaded', () => {
   const form = document.getElementById('profileForm')
   const cancelBtn = document.getElementById('cancelEditBtn')
   const profileMessage = document.getElementById('profileMessage')
+
+    // User dialogue helpers
+    const dialog = document.getElementById('userDialog')
+    const dialogTitle = document.getElementById('userDialogTitle')
+    const dialogBody = document.getElementById('userDialogBody')
+    const dialogBadge = document.getElementById('userDialogBadge')
+    const dialogClose = document.getElementById('userDialogClose')
+
+    const toneStyles = {
+      success: 'bg-green-100 text-green-700 border-green-200',
+      error: 'bg-rose-100 text-rose-700 border-rose-200',
+      info: 'bg-blue-100 text-blue-700 border-blue-200'
+    }
+
+    const showDialog = (title, message, tone = 'info') => {
+      dialogTitle.textContent = title
+      dialogBody.textContent = message
+      dialogBadge.className = `w-10 h-10 rounded-full flex items-center justify-center text-base font-semibold ${toneStyles[tone] || toneStyles.info}`
+      dialog.classList.remove('hidden')
+      dialog.classList.add('flex')
+      dialogClose?.focus()
+    }
+
+    const hideDialog = () => {
+      dialog.classList.add('hidden')
+      dialog.classList.remove('flex')
+    }
+
+    dialogClose?.addEventListener('click', hideDialog)
+    dialog?.addEventListener('click', e => {
+      if (e.target === dialog) hideDialog()
+    })
 
   editBtn?.addEventListener('click', () => {
     form.classList.remove('hidden')
@@ -184,9 +246,11 @@ document.addEventListener('DOMContentLoaded', () => {
     try {
       const data = await apiRequest('/api/member/profile', 'PUT', payload)
       profileMessage.textContent = 'Profile updated.'
+      showDialog('Profile updated', 'Your changes have been saved successfully.', 'success')
       setTimeout(() => location.reload(), 800)
     } catch (err) {
       profileMessage.textContent = err?.message || 'Update failed'
+      showDialog('Update failed', err?.message || 'We could not save your profile. Try again.', 'error')
     }
   })
 
@@ -218,9 +282,15 @@ document.addEventListener('DOMContentLoaded', () => {
       })
 
       resumeStatus.textContent = res.ok ? 'Resume uploaded.' : 'Upload failed'
-      if (res.ok) setTimeout(() => location.reload(), 800)
+      if (res.ok) {
+        showDialog('Resume uploaded', 'Your resume has been uploaded successfully.', 'success')
+        setTimeout(() => location.reload(), 800)
+      } else {
+        showDialog('Upload failed', 'Please check the file and try again.', 'error')
+      }
     } catch {
       resumeStatus.textContent = 'Upload failed'
+      showDialog('Upload failed', 'Please check your connection and try again.', 'error')
     }
   })
 })

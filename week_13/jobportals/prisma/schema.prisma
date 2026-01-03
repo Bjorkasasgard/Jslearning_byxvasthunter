@@ -60,6 +60,7 @@ model Application {
   userId       Int
   jobVacancyId Int
   coverLetter  String?
+  coverLetterFile String?
   answers      Json?
   resumeLink   String?
   notificationRead Boolean @default(false)

@@ -1,6 +1,7 @@
 // job vacancy management logic
 
 const prisma = require("../prisma/client");
+const sanitizeHtml = require('sanitize-html');
 
 module.exports = {
   // PUBLIC JOB LIST
@@ -48,53 +49,76 @@ module.exports = {
   // APPLY JOB (MEMBER)
   apply: async (req, res) => {
     const jobVacancyId = Number(req.params.id);
-    const { coverLetter, answers, resumeLink } = req.body;
+    let answers = undefined;
+    if (Array.isArray(req.body?.answers)) {
+      answers = req.body.answers;
+    } else if (typeof req.body?.answers === 'string' && req.body.answers.trim()) {
+      // single answer fallback
+      answers = [req.body.answers.trim()];
+    }
+    const coverLetterFile = req.files?.coverLetterFile?.[0];
+    const resumeFile = req.files?.resumeFile?.[0];
 
     try {
-      // ensure vacancy exists and is open
       const vacancy = await prisma.jobVacancy.findUnique({ where: { id: jobVacancyId } });
       if (!vacancy) return res.status(404).json({ message: 'Vacancy not found' });
       if (vacancy.status === 'CLOSED') return res.status(400).json({ message: 'Cannot apply to a closed vacancy' });
 
-      const baseData = {
+      const user = await prisma.user.findUnique({ where: { id: req.user.id } });
+      if (!user) return res.status(401).json({ message: 'User not found' });
+
+      // Cover letter: rich text (stored in `coverLetter`) + optional PDF (stored in `coverLetterFile`).
+      const rawCoverLetter = typeof req.body?.coverLetter === 'string' ? req.body.coverLetter : '';
+      const coverLetter = rawCoverLetter
+        ? sanitizeHtml(rawCoverLetter, {
+            allowedTags: ['b', 'i', 'em', 'strong', 'u', 'p', 'br', 'ul', 'ol', 'li'],
+            allowedAttributes: {},
+          })
+        : null;
+
+      const coverLetterFilePath = coverLetterFile
+        ? `/uploads/application_letters/${coverLetterFile.filename}`
+        : null;
+
+      if (!coverLetter && !coverLetterFilePath) {
+        return res.status(400).json({ message: 'Please write a cover letter or attach a cover letter PDF.' });
+      }
+
+      const resumePath = resumeFile
+        ? `/uploads/resumes/${resumeFile.filename}`
+        : user.resume;
+
+      if (!resumePath) {
+        return res.status(400).json({ message: 'Please upload your resume in your profile or attach it here.' });
+      }
+
+      const cleanAnswers = Array.isArray(answers)
+        ? answers.map(a => (typeof a === 'string' ? a.trim() : '')).filter(Boolean)
+        : undefined;
+
+      const data = {
         userId: req.user.id,
         jobVacancyId,
         coverLetter,
-        answers: answers && Array.isArray(answers) ? answers : undefined,
+        coverLetterFile: coverLetterFilePath,
+        resumeLink: resumePath,
+        answers: cleanAnswers,
       };
 
-      // attach resumeLink only when provided
-      if (resumeLink) baseData.resumeLink = resumeLink;
-
-      let application;
-      try {
-        application = await prisma.application.create({ data: baseData });
-      } catch (err) {
-        // If schema is not migrated (no resumeLink column), retry without it
-        const msg = err?.message || '';
-        const missingResumeCol = msg.includes('resumeLink') || msg.includes('ResumeLink') || msg.includes('no such column') || msg.includes('Unknown arg `resumeLink`');
-        if (missingResumeCol && baseData.resumeLink) {
-          const { resumeLink: _, ...fallbackData } = baseData;
-          application = await prisma.application.create({ data: fallbackData });
-          console.warn('[vacancyController.apply] resumeLink column missing; application saved without resumeLink. Run prisma migrate.');
-        } else {
-          throw err;
-        }
-      }
+      const application = await prisma.application.create({ data });
 
       res.status(201).json({
-        message: "Application submitted",
+        message: 'Application submitted',
         application,
       });
     } catch (err) {
-      // Unique constraint duplicate apply
       if (err?.code === 'P2002') {
-        return res.status(400).json({ message: "You already applied to this job" });
+        return res.status(400).json({ message: 'You already applied to this job' });
       }
 
       console.error('[vacancyController.apply] submit failed:', err);
       res.status(400).json({
-        message: err?.message || "Failed to submit application",
+        message: err?.message || 'Failed to submit application',
       });
     }
   },

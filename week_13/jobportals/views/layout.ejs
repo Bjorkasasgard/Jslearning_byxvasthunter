@@ -23,9 +23,10 @@
 </head>
 
 <%
-  const isLoggedIn = !!currentUser;
-  const isAdmin = isLoggedIn && currentUser.role === 'ADMIN';
-  const isMember = isLoggedIn && currentUser.role === 'MEMBER';
+  const currentUserSafe = (typeof currentUser !== 'undefined') ? currentUser : null;
+  const isLoggedIn = !!currentUserSafe;
+  const isAdmin = isLoggedIn && currentUserSafe.role === 'ADMIN';
+  const isMember = isLoggedIn && currentUserSafe.role === 'MEMBER';
   const isAuthPage = typeof authPage !== 'undefined' && authPage;
 %>
 
@@ -186,11 +187,68 @@
 
 <% } %>
 
+<!-- Global user dialog overlay -->
+<div id="globalUserDialog" class="fixed inset-0 bg-slate-900/40 hidden items-center justify-center z-[60]">
+  <div class="bg-white rounded-xl shadow-xl max-w-md w-full mx-4 p-6 space-y-4 border border-slate-100">
+    <div class="flex items-start gap-3">
+      <div id="globalUserDialogBadge" class="w-10 h-10 rounded-full flex items-center justify-center text-base font-semibold bg-blue-100 text-blue-700 border border-blue-200">i</div>
+      <div class="space-y-1">
+        <p id="globalUserDialogTitle" class="text-lg font-semibold text-slate-900">Notification</p>
+        <p id="globalUserDialogBody" class="text-sm text-slate-600 leading-relaxed">Message</p>
+      </div>
+    </div>
+    <div class="flex justify-end gap-3">
+      <button id="globalUserDialogClose" class="px-4 py-2 rounded-md border border-slate-200 text-slate-700 hover:bg-slate-50">Close</button>
+    </div>
+  </div>
+</div>
+
 <script src="/javascripts/api.js"></script>
 <script src="/javascripts/auth.js"></script>
 
 <script>
   lucide.createIcons();
+
+  // reusable user dialog helper (singleton)
+  (function setupUserDialog() {
+    const dialog = document.getElementById('globalUserDialog');
+    const titleEl = document.getElementById('globalUserDialogTitle');
+    const bodyEl = document.getElementById('globalUserDialogBody');
+    const badgeEl = document.getElementById('globalUserDialogBadge');
+    const closeBtn = document.getElementById('globalUserDialogClose');
+
+    if (!dialog || !titleEl || !bodyEl || !badgeEl) return;
+
+    const toneStyles = {
+      success: 'bg-green-100 text-green-700 border-green-200',
+      error: 'bg-rose-100 text-rose-700 border-rose-200',
+      info: 'bg-blue-100 text-blue-700 border-blue-200'
+    };
+
+    const show = (title, message, tone = 'info') => {
+      titleEl.textContent = title || 'Notification';
+      bodyEl.textContent = message || '';
+      badgeEl.className = `w-10 h-10 rounded-full flex items-center justify-center text-base font-semibold ${toneStyles[tone] || toneStyles.info}`;
+      dialog.classList.remove('hidden');
+      dialog.classList.add('flex');
+      closeBtn?.focus();
+    };
+
+    const hide = () => {
+      dialog.classList.add('hidden');
+      dialog.classList.remove('flex');
+    };
+
+    closeBtn?.addEventListener('click', hide);
+    dialog?.addEventListener('click', (e) => {
+      if (e.target === dialog) hide();
+    });
+    document.addEventListener('keyup', (e) => {
+      if (e.key === 'Escape' && !dialog.classList.contains('hidden')) hide();
+    });
+
+    window.userDialog = { show, hide };
+  })();
 
   document.addEventListener('DOMContentLoaded', () => {
     const userBtn = document.getElementById('userDropdownBtn');

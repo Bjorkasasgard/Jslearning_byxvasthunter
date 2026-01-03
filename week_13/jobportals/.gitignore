@@ -6,4 +6,11 @@ node_modules
 
 # Ignore local database and uploaded assets
 /prisma/prisma/db.sqlite
-/public/uploads/
+
+# Uploaded files (canonical location)
+/public/storage/uploads/
+
+# Local/editor/test artifacts
+/.vscode/
+/coverage/
+

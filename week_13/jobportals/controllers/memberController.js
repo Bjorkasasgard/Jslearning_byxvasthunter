@@ -6,7 +6,7 @@ module.exports = {
   myApplications: async (req, res) => {
     const apps = await prisma.application.findMany({
       where: { userId: req.user.id },
-      include: { jobVacancy: true },
+      include: { jobVacancy: true, user: true },
     });
 
     res.json(apps);
@@ -17,10 +17,23 @@ module.exports = {
 
     const app = await prisma.application.findFirst({
       where: { id, userId: req.user.id },
-      include: { jobVacancy: true },
+      include: { jobVacancy: true, user: true },
     });
 
     if (!app) return res.status(404).json({ message: "Not found" });
+
+    res.json(app);
+  },
+
+  applicationByJob: async (req, res) => {
+    const jobVacancyId = Number(req.params.jobId);
+
+    const app = await prisma.application.findFirst({
+      where: { jobVacancyId, userId: req.user.id },
+      include: { jobVacancy: true, user: true },
+    });
+
+    if (!app) return res.status(404).json({ message: 'Application not found' });
 
     res.json(app);
   },

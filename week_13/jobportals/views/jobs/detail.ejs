@@ -136,13 +136,18 @@
 
           <div id="applyAlert" class="hidden text-xs rounded-lg border px-3 py-2"></div>
 
-          <form id="applyWizard" class="space-y-4" data-job-id="<%= job.id %>">
+          <div id="existingApplication" class="hidden text-sm text-indigo-700 bg-indigo-50 border border-indigo-100 rounded-lg px-3 py-2"></div>
+
+          <button type="button" id="viewApplicationBtn"
+            class="hidden text-sm text-indigo-600 underline font-medium">View my application</button>
+
+          <form id="applyWizard" class="space-y-4" data-job-id="<%= job.id %>" data-default-resume='<%= currentUser?.resume || '' %>'>
 
             <!-- STEP 1: Location -->
             <div class="step space-y-2">
               <div class="flex items-center justify-between text-sm">
                 <label class="font-medium">Where are you located?</label>
-                <span class="text-slate-400">Required</span>
+                <span class="text-slate-400">Optional</span>
               </div>
               <input type="text" id="userLocation" value="<%= currentUser.location || '' %>"
                 class="w-full border rounded-lg p-2 focus:ring-2 focus:ring-indigo-200" placeholder="City, Country" />
@@ -151,31 +156,53 @@
 
             <!-- STEP 2: Cover letter + resume -->
             <div class="step hidden space-y-3">
-              <div class="flex items-center justify-between text-sm">
-                <label for="coverLetter" class="font-medium">Tell us about you</label>
-                <span class="text-slate-400">Recommended</span>
-              </div>
-              <textarea id="coverLetter" class="w-full border rounded-lg p-2 text-sm focus:ring-2 focus:ring-indigo-200" rows="5"
-                placeholder="Briefly introduce yourself and why you are a fit."></textarea>
-              <p class="text-xs text-slate-500">Highlight relevant experience, notice period, and availability.</p>
-
-              <div class="space-y-1">
+              <div class="space-y-2">
                 <div class="flex items-center justify-between text-sm">
-                  <label for="resumeLink" class="font-medium">Resume link</label>
-                  <span class="text-slate-400">Required</span>
+                  <label class="font-medium">Cover letter</label>
+                  <span class="text-rose-500">Required</span>
                 </div>
-                <% if (currentUser.resume) { %>
+
+                <div class="border rounded-lg bg-white focus-within:ring-2 focus-within:ring-indigo-200">
+                  <div id="coverLetterEditor"
+                       contenteditable="true"
+                       class="min-h-[140px] p-3 text-sm text-slate-700 outline-none"
+                       aria-label="Cover letter editor"></div>
+                </div>
+                <p class="text-xs text-slate-500">Write your cover letter here. You can also attach a PDF (optional).</p>
+
+                <div class="pt-2">
+                  <div class="flex items-center justify-between text-sm">
+                    <label for="coverLetterFile" class="font-medium">Attach cover letter (PDF)</label>
+                    <span class="text-slate-400">Optional</span>
+                  </div>
+                  <input type="file" id="coverLetterFile" accept="application/pdf"
+                    class="w-full border rounded-lg p-2 text-sm focus:ring-2 focus:ring-indigo-200 bg-white" />
+                </div>
+              </div>
+
+              <div class="space-y-2">
+                <div class="flex items-center justify-between text-sm">
+                  <label for="resumeFile" class="font-medium">Resume</label>
+                  <span class="text-slate-400">Your resume by default</span>
+                </div>
+
+                <% if (currentUser?.resume) { %>
                   <div class="text-xs bg-slate-50 border rounded-lg p-3 flex items-center gap-2">
                     <span>📄</span>
                     <a href="<%= currentUser.resume %>" target="_blank" class="text-indigo-600 hover:underline">
                       <%= currentUser.resume.split('/').pop() %>
                     </a>
-                    <span class="text-slate-400">(default)</span>
+                    <span class="text-slate-400">(profile)</span>
+                  </div>
+                <% } else { %>
+                  <div class="text-xs bg-amber-50 border border-amber-200 rounded-lg p-3 text-amber-800">
+                    No resume on profile yet. Please upload one here.
                   </div>
                 <% } %>
-                <input type="url" id="resumeLink" value="<%= currentUser.resume || '' %>"
-                  class="w-full border rounded-lg p-2 text-sm focus:ring-2 focus:ring-indigo-200" placeholder="https://..." required />
-                <p class="text-xs text-slate-500">Paste a link to your resume (Google Drive, Dropbox, etc.). Make sure link is viewable.</p>
+
+                <input type="file" id="resumeFile" accept="application/pdf"
+                  class="w-full border rounded-lg p-2 text-sm focus:ring-2 focus:ring-indigo-200 bg-white" />
+                <p class="text-xs text-slate-500">You can override the profile resume for this application.</p>
               </div>
             </div>
 

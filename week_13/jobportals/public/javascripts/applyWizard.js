@@ -9,9 +9,12 @@ document.addEventListener('DOMContentLoaded', function () {
   const stepName = document.getElementById('stepName');
   const stepProgress = document.getElementById('stepProgress');
   const alertBox = document.getElementById('applyAlert');
+  const existingBox = document.getElementById('existingApplication');
+  const viewAppBtn = document.getElementById('viewApplicationBtn');
 
   const jobId = Number(wizard.dataset.jobId);
-  const stepTitles = ['Profile location', 'Cover letter', 'Questions'];
+  const defaultResume = wizard.dataset.defaultResume || '';
+  const stepTitles = ['Profile location', 'Documents', 'Questions'];
   let currentStep = 0;
 
   function showAlert(message, variant = 'info') {
@@ -48,16 +51,25 @@ document.addEventListener('DOMContentLoaded', function () {
 
   function validateStep(idx) {
     if (idx === 0) {
-      const location = document.getElementById('userLocation');
-      if (!location || !location.value.trim()) {
-        showAlert('Please provide your location.', 'error');
-        return false;
-      }
+      clearAlert();
+      return true;
     }
     if (idx === 1) {
-      const resumeLink = document.getElementById('resumeLink');
-      if (!resumeLink || !resumeLink.value.trim()) {
-        showAlert('Please provide a resume link.', 'error');
+      const coverFile = document.getElementById('coverLetterFile');
+      const coverEditor = document.getElementById('coverLetterEditor');
+      const resumeFile = document.getElementById('resumeFile');
+      const hasCoverPdf = coverFile?.files?.length;
+      const coverText = (coverEditor?.textContent || '').trim();
+      const hasCoverText = !!coverText;
+      const hasResume = (resumeFile?.files?.length || defaultResume);
+
+      if (!hasCoverText && !hasCoverPdf) {
+        showAlert('Please write a cover letter or attach a PDF.', 'error');
+        return false;
+      }
+
+      if (!hasResume) {
+        showAlert('Please upload a resume (PDF) or set one in your profile.', 'error');
         return false;
       }
     }
@@ -76,25 +88,20 @@ document.addEventListener('DOMContentLoaded', function () {
 
   async function submitApplication() {
     const locationInput = document.getElementById('userLocation');
-    const coverLetterInput = document.getElementById('coverLetter');
-    const resumeLinkInput = document.getElementById('resumeLink');
+    const coverLetterFile = document.getElementById('coverLetterFile');
+    const coverLetterEditor = document.getElementById('coverLetterEditor');
+    const resumeFile = document.getElementById('resumeFile');
     const questionTextareas = Array.from(wizard.querySelectorAll('.question-answer'));
 
-    const locationText = locationInput ? locationInput.value.trim() : '';
-    const baseCover = coverLetterInput ? coverLetterInput.value.trim() : '';
-    const resumeLink = resumeLinkInput ? resumeLinkInput.value.trim() : '';
-
-    const coverParts = [];
-    if (baseCover) coverParts.push(baseCover);
-    if (locationText) coverParts.push(`Location: ${locationText}`);
-    if (resumeLink) coverParts.push(`Resume: ${resumeLink}`);
-    const coverLetter = coverParts.join('\n\n');
-
-    const payload = {
-      coverLetter,
-      answers: questionTextareas.map((ta) => ta.value.trim()),
-      resumeLink,
-    };
+    const formData = new FormData();
+    formData.append('location', locationInput ? locationInput.value.trim() : '');
+    if (coverLetterEditor) {
+      // Send sanitized HTML will happen server-side.
+      formData.append('coverLetter', (coverLetterEditor.innerHTML || '').trim());
+    }
+    questionTextareas.forEach((ta) => formData.append('answers', ta.value.trim()));
+    if (coverLetterFile?.files?.[0]) formData.append('coverLetterFile', coverLetterFile.files[0]);
+    if (resumeFile?.files?.[0]) formData.append('resumeFile', resumeFile.files[0]);
 
     async function getCsrfToken() {
       try {
@@ -115,11 +122,10 @@ document.addEventListener('DOMContentLoaded', function () {
       const res = await fetch(`/api/vacancies/${jobId}/apply`, {
         method: 'POST',
         headers: {
-          'Content-Type': 'application/json',
           ...(csrf ? { 'x-csrf-token': csrf } : {}),
         },
         credentials: 'include',
-        body: JSON.stringify(payload),
+        body: formData,
       });
 
       if (!res.ok) {
@@ -144,6 +150,8 @@ document.addEventListener('DOMContentLoaded', function () {
 
       showAlert('Application submitted successfully.', 'success');
       wizard.reset();
+      const editor = document.getElementById('coverLetterEditor');
+      if (editor) editor.innerHTML = '';
       currentStep = 0;
       updateStepUI(currentStep);
     } catch (err) {
@@ -155,7 +163,37 @@ document.addEventListener('DOMContentLoaded', function () {
     }
   }
 
+  async function loadExistingApplication() {
+    try {
+      const res = await fetch(`/api/member/applications/by-job/${jobId}`, { credentials: 'include' });
+      if (!res.ok) return;
+      const app = await res.json();
+      if (!app) return;
+
+      if (existingBox) {
+        const appliedDate = app.createdAt ? new Date(app.createdAt).toLocaleDateString() : '';
+        const coverLink = app.coverLetterFile
+          ? `<a href="${app.coverLetterFile}" target="_blank" class="text-indigo-600 underline">Cover letter (PDF)</a>`
+          : (app.coverLetter ? 'Cover letter submitted' : 'Cover letter not found');
+        const resumeLink = app.resumeLink ? `<a href="${app.resumeLink}" target="_blank" class="text-indigo-600 underline">Resume</a>` : 'Resume not found';
+        existingBox.innerHTML = `You applied on ${appliedDate}. ${coverLink} · ${resumeLink}`;
+        existingBox.classList.remove('hidden');
+      }
+
+      if (viewAppBtn && (app.coverLetterFile || app.resumeLink)) {
+        viewAppBtn.classList.remove('hidden');
+        viewAppBtn.addEventListener('click', () => {
+          if (app.coverLetterFile) window.open(app.coverLetterFile, '_blank');
+          if (app.resumeLink) window.open(app.resumeLink, '_blank');
+        });
+      }
+    } catch (err) {
+      // silent fail
+    }
+  }
+
   updateStepUI(currentStep);
+  loadExistingApplication();
 
   nextBtn.addEventListener('click', () => {
     if (!validateStep(currentStep)) return;
