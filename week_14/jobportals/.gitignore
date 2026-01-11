@@ -1,0 +1,16 @@
+node_modules
+# Keep environment variables out of version control
+.env
+
+/generated/prisma
+
+# Ignore local database and uploaded assets
+/prisma/prisma/db.sqlite
+
+# Uploaded files (canonical location)
+/public/storage/uploads/
+
+# Local/editor/test artifacts
+/.vscode/
+/coverage/
+

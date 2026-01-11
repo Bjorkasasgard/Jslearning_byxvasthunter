@@ -1,0 +1,354 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title><%= title || "Job Portal" %></title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <!-- Tailwind -->
+  <script src="https://cdn.tailwindcss.com"></script>
+
+  <!-- Lucide Icons -->
+  <script src="https://unpkg.com/lucide@latest"></script>
+
+  <style>
+    body {
+      background: radial-gradient(1200px circle at top, #eef2ff, #f8fafc);
+    }
+  </style>
+
+  <% if (typeof pageStyles !== 'undefined') { %>
+    <link rel="stylesheet" href="<%= pageStyles %>">
+  <% } %>
+</head>
+
+<%
+  const currentUserSafe = (typeof currentUser !== 'undefined') ? currentUser : null;
+  const isLoggedIn = !!currentUserSafe;
+  const isAdmin = isLoggedIn && currentUserSafe.role === 'ADMIN';
+  const isMember = isLoggedIn && currentUserSafe.role === 'MEMBER';
+  const isAuthPage = typeof authPage !== 'undefined' && authPage;
+%>
+
+<body class="min-h-screen text-slate-800">
+
+<% // ensure notifications always defined to avoid ReferenceError in views %>
+<% notifications = typeof notifications !== 'undefined' ? notifications : []; %>
+
+<% if (isAuthPage) { %>
+  <main class="min-h-screen flex items-center justify-center px-4">
+    <%- body %>
+  </main>
+<% } else { %>
+
+<div class="min-h-screen flex <%= isAdmin ? 'flex-row' : 'flex-col' %>">
+
+  <% if (isAdmin) { %>
+  <aside class="w-64 bg-white border-r hidden md:flex flex-col">
+    <div class="h-16 flex items-center px-6 font-semibold text-lg border-b">
+      Admin Panel
+    </div>
+
+    <nav class="flex-1 px-4 py-4 space-y-1 text-sm">
+      <a href="/admin/dashboard" class="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-indigo-50">
+        <i data-lucide="layout-dashboard" class="w-4 h-4"></i> Dashboard
+      </a>
+      <a href="/admin/users" class="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-indigo-50">
+        <i data-lucide="users" class="w-4 h-4"></i> Users
+      </a>
+      <a href="/admin/vacancies" class="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-indigo-50">
+        <i data-lucide="briefcase" class="w-4 h-4"></i> Vacancies
+      </a>
+      <a href="/admin/applications" class="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-indigo-50">
+        <i data-lucide="file-text" class="w-4 h-4"></i> Applications
+      </a>
+    </nav>
+
+    <div class="border-t px-4 py-3 text-sm">
+      <div class="text-slate-500 mb-2"><%= currentUser.name || "Admin" %></div>
+      <button id="logoutBtn" class="w-full px-3 py-2 rounded-lg bg-slate-900 text-white">
+        Logout
+      </button>
+    </div>
+  </aside>
+  <% } %>
+
+  <div class="flex-1 flex flex-col">
+
+    <% if (!isAdmin) { %>
+    <header class="sticky top-0 z-50">
+      <div class="bg-white/80 backdrop-blur border-b">
+        <div class="max-w-7xl mx-auto px-6 min-h-[72px] flex items-center gap-6">
+
+          <a href="/jobs" class="font-semibold text-lg shrink-0">
+            JobPortal
+          </a>
+
+          <div class="flex-1 flex justify-center">
+            <form action="/jobs" method="get" class="relative w-full max-w-xl">
+              <i data-lucide="search"
+                 class="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400 pointer-events-none"></i>
+              <input
+                name="q"
+                placeholder="Search jobs or companies"
+                class="w-full pl-9 pr-4 py-2 text-sm rounded-xl border
+                       focus:outline-none focus:ring-2 focus:ring-indigo-200"
+              />
+            </form>
+          </div>
+
+          <nav class="flex items-center gap-2 shrink-0">
+
+            <% if (isMember) { %>
+              <div class="relative">
+                <% const unreadCount = (notifications || []).filter(n => !n.read).length; %>
+                <button id="notifBtn" class="relative w-10 h-10 flex items-center justify-center rounded-xl hover:bg-slate-100">
+                  <i data-lucide="bell" class="w-5 h-5"></i>
+                  <% if (unreadCount) { %>
+                    <span id="notifBadge" class="absolute -top-1 -right-1 text-xs bg-amber-500 text-white rounded-full px-1.5"><%= unreadCount %></span>
+                  <% } %>
+                </button>
+
+                <div id="notifMenu" class="absolute right-0 mt-2 w-80 bg-white border rounded-xl shadow-sm hidden z-50">
+                  <div class="p-3 border-b font-medium">Notifications</div>
+                  <div id="notifList" class="max-h-64 overflow-auto divide-y divide-slate-100">
+                    <% if (notifications && notifications.length) { %>
+                      <% notifications.forEach(n => { %>
+                        <button class="w-full text-left px-4 py-3 text-sm notif-item <%= n.read ? 'bg-slate-50 text-slate-600' : 'bg-white text-slate-800 unread' %> hover:bg-indigo-50" data-app-id="<%= n.id %>">
+                          <div class="flex items-start justify-between gap-3">
+                            <div>
+                              <div class="font-semibold <%= n.read ? 'text-slate-700' : 'text-slate-900' %>"><%= n.jobTitle %></div>
+                              <div class="text-xs flex items-center gap-2">
+                                <span class="inline-flex px-2 py-0.5 rounded-full text-[11px] font-semibold
+                                  <%= n.status === 'ACCEPTED'
+                                    ? 'bg-green-100 text-green-700'
+                                    : n.status === 'REJECTED'
+                                      ? 'bg-rose-100 text-rose-700'
+                                      : n.status === 'REVIEWED'
+                                        ? 'bg-amber-100 text-amber-700'
+                                        : 'bg-slate-100 text-slate-700' %>">
+                                  <%= n.status %>
+                                </span>
+                                <span class="text-slate-500"><%= new Date(n.updatedAt).toLocaleString() %></span>
+                              </div>
+                            </div>
+                          </div>
+                        </button>
+                      <% }) %>
+                    <% } else { %>
+                      <div class="p-4 text-sm text-slate-500">No notifications</div>
+                    <% } %>
+                  </div>
+                  <div class="border-t p-2 text-center"><a href="/applications" class="text-sm text-indigo-600">View all</a></div>
+                </div>
+              </div>
+
+              <div class="relative">
+                <button id="userDropdownBtn"
+                  class="flex items-center gap-2 px-3 py-1.5 rounded-xl hover:bg-slate-100">
+                  <i data-lucide="user" class="w-5 h-5"></i>
+                  <span class="hidden sm:block font-medium"><%= currentUser.name %></span>
+                  <i data-lucide="chevron-down" class="w-4 h-4 text-slate-400"></i>
+                </button>
+
+                <div id="userDropdownMenu"
+                  class="absolute right-0 mt-2 w-48 bg-white border rounded-xl shadow-sm hidden z-50">
+                  <a href="/profile" class="block px-4 py-2 hover:bg-slate-100">Profile</a>
+                  <a href="/applications" class="block px-4 py-2 hover:bg-slate-100">My Applications</a>
+                  <button id="logoutBtn" class="w-full text-left px-4 py-2 hover:bg-slate-100">
+                    Logout
+                  </button>
+                </div>
+              </div>
+
+            <% } else if (!isLoggedIn) { %>
+              <a href="/auth/login"
+                 class="inline-flex items-center gap-2 px-4 py-2 rounded-xl
+                        bg-indigo-600 text-white text-sm font-medium hover:bg-indigo-700">
+                Get Started
+              </a>
+            <% } %>
+
+          </nav>
+        </div>
+      </div>
+    </header>
+    <% } %>
+
+    <main class="<%= isAdmin
+      ? 'flex-1 p-6 bg-slate-50'
+      : 'flex-1 max-w-7xl mx-auto w-full px-6 py-10'
+    %>">
+      <%- body %>
+    </main>
+
+  </div>
+</div>
+
+<% } %>
+
+<!-- Global user dialog overlay -->
+<div id="globalUserDialog" class="fixed inset-0 bg-slate-900/40 hidden items-center justify-center z-[60]">
+  <div class="bg-white rounded-xl shadow-xl max-w-md w-full mx-4 p-6 space-y-4 border border-slate-100">
+    <div class="flex items-start gap-3">
+      <div id="globalUserDialogBadge" class="w-10 h-10 rounded-full flex items-center justify-center text-base font-semibold bg-blue-100 text-blue-700 border border-blue-200">i</div>
+      <div class="space-y-1">
+        <p id="globalUserDialogTitle" class="text-lg font-semibold text-slate-900">Notification</p>
+        <p id="globalUserDialogBody" class="text-sm text-slate-600 leading-relaxed">Message</p>
+      </div>
+    </div>
+    <div class="flex justify-end gap-3">
+      <button id="globalUserDialogClose" class="px-4 py-2 rounded-md border border-slate-200 text-slate-700 hover:bg-slate-50">Close</button>
+    </div>
+  </div>
+</div>
+
+<script src="/javascripts/api.js"></script>
+<script src="/javascripts/auth.js"></script>
+
+<script>
+  lucide.createIcons();
+
+  // reusable user dialog helper (singleton)
+  (function setupUserDialog() {
+    const dialog = document.getElementById('globalUserDialog');
+    const titleEl = document.getElementById('globalUserDialogTitle');
+    const bodyEl = document.getElementById('globalUserDialogBody');
+    const badgeEl = document.getElementById('globalUserDialogBadge');
+    const closeBtn = document.getElementById('globalUserDialogClose');
+
+    if (!dialog || !titleEl || !bodyEl || !badgeEl) return;
+
+    const toneStyles = {
+      success: 'bg-green-100 text-green-700 border-green-200',
+      error: 'bg-rose-100 text-rose-700 border-rose-200',
+      info: 'bg-blue-100 text-blue-700 border-blue-200'
+    };
+
+    const show = (title, message, tone = 'info') => {
+      titleEl.textContent = title || 'Notification';
+      bodyEl.textContent = message || '';
+      badgeEl.className = `w-10 h-10 rounded-full flex items-center justify-center text-base font-semibold ${toneStyles[tone] || toneStyles.info}`;
+      dialog.classList.remove('hidden');
+      dialog.classList.add('flex');
+      closeBtn?.focus();
+    };
+
+    const hide = () => {
+      dialog.classList.add('hidden');
+      dialog.classList.remove('flex');
+    };
+
+    closeBtn?.addEventListener('click', hide);
+    dialog?.addEventListener('click', (e) => {
+      if (e.target === dialog) hide();
+    });
+    document.addEventListener('keyup', (e) => {
+      if (e.key === 'Escape' && !dialog.classList.contains('hidden')) hide();
+    });
+
+    window.userDialog = { show, hide };
+  })();
+
+  document.addEventListener('DOMContentLoaded', () => {
+    const userBtn = document.getElementById('userDropdownBtn');
+    const userMenu = document.getElementById('userDropdownMenu');
+    const notifBtn = document.getElementById('notifBtn');
+    const notifMenu = document.getElementById('notifMenu');
+    let notifBadge = document.getElementById('notifBadge');
+    const notifList = document.getElementById('notifList');
+
+    if (userBtn && userMenu) {
+      userBtn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        userMenu.classList.toggle('hidden');
+        // hide notif when opening user menu
+        if (notifMenu) notifMenu.classList.add('hidden');
+      });
+    }
+
+    if (notifBtn && notifMenu) {
+      notifBtn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        notifMenu.classList.toggle('hidden');
+        // hide user menu when opening notif
+        if (userMenu) userMenu.classList.add('hidden');
+
+      });
+    }
+
+    // Mark single notification as read when clicked
+    if (notifList) {
+      const updateBadge = () => {
+        const unread = notifList.querySelectorAll('.notif-item.unread').length;
+        if (unread > 0) {
+          if (!notifBadge) {
+            notifBadge = document.createElement('span');
+            notifBadge.id = 'notifBadge';
+            notifBadge.className = 'absolute -top-1 -right-1 text-xs bg-amber-500 text-white rounded-full px-1.5';
+            notifBtn.appendChild(notifBadge);
+          }
+          notifBadge.textContent = unread;
+        } else if (notifBadge) {
+          notifBadge.remove();
+          notifBadge = null;
+        }
+        if (unread === 0 && notifList.children.length === 0) {
+          const empty = document.createElement('div');
+          empty.className = 'p-4 text-sm text-slate-500';
+          empty.textContent = 'No notifications';
+          notifList.appendChild(empty);
+        }
+      };
+
+      async function getCsrfToken() {
+        try {
+          const res = await fetch('/api/csrf', { credentials: 'same-origin' });
+          const data = await res.json();
+          return data?.csrfToken || '';
+        } catch (_) {
+          return '';
+        }
+      }
+
+      notifList.addEventListener('click', async (ev) => {
+        const target = ev.target.closest('.notif-item');
+        if (!target) return;
+        const appId = target.dataset.appId;
+        // optimistic UI but revert if failed
+        const revert = () => {
+          target.classList.add('unread');
+          target.classList.remove('bg-slate-50', 'text-slate-600');
+        };
+        target.classList.remove('unread');
+        target.classList.add('bg-slate-50', 'text-slate-600');
+        try {
+          const csrf = await getCsrfToken();
+          const res = await fetch(`/api/member/applications/${appId}/read`, {
+            method: 'POST',
+            credentials: 'include',
+            headers: csrf ? { 'x-csrf-token': csrf } : {},
+          });
+          if (!res.ok) {
+            revert();
+            return alert('Failed to mark notification as read');
+          }
+        } catch (err) {
+          revert();
+          return alert('Failed to mark notification as read');
+        }
+        target.remove();
+        updateBadge();
+        window.location.href = '/applications';
+      });
+    }
+
+    document.addEventListener('click', (e) => {
+      if (userMenu && userBtn && !userMenu.contains(e.target) && !userBtn.contains(e.target)) userMenu.classList.add('hidden');
+      if (notifMenu && notifBtn && !notifMenu.contains(e.target) && !notifBtn.contains(e.target)) notifMenu.classList.add('hidden');
+    });
+  });
+</script>
+
+</body>
+</html>

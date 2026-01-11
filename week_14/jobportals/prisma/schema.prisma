@@ -1,0 +1,75 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id        Int       @id @default(autoincrement())
+  email     String    @unique
+  password  String
+  name      String
+  role      Role      @default(MEMBER)
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  city        String?
+  resume      String?
+  phone       String?
+  
+  createdVacancies JobVacancy[]
+  applications     Application[]
+}
+
+enum Role {
+  ADMIN
+  MEMBER
+}
+
+model JobVacancy {
+  id           Int       @id @default(autoincrement())
+  title        String
+  company      String
+  location     String
+  description  String
+  requirements String
+  salary       String?
+  jobType      JobType  @default(FULLTIME)
+  questions    Json?
+  status       String    @default("ACTIVE") // ACTIVE or CLOSED
+  createdBy    Int
+  createdAt    DateTime  @default(now())
+  updatedAt    DateTime  @updatedAt
+  
+  creator      User         @relation(fields: [createdBy], references: [id])
+  applications Application[]
+}
+
+enum JobType {
+  FULLTIME
+  PARTTIME
+  REMOTE
+  HYBRID
+  CONTRACT
+}
+
+model Application {
+  id           Int       @id @default(autoincrement())
+  userId       Int
+  jobVacancyId Int
+  coverLetter  String?
+  coverLetterFile String?
+  answers      Json?
+  resumeLink   String?
+  notificationRead Boolean @default(false)
+  status       String    @default("PENDING") // PENDING, REVIEWED, ACCEPTED, REJECTED
+  createdAt    DateTime  @default(now())
+  updatedAt    DateTime  @updatedAt
+  
+  user         User      @relation(fields: [userId], references: [id])
+  jobVacancy   JobVacancy @relation(fields: [jobVacancyId], references: [id])
+  
+  @@unique([userId, jobVacancyId])
+}

@@ -1,0 +1,31 @@
+<div class="w-full max-w-md bg-white/90 backdrop-blur rounded-2xl shadow-sm border px-6 py-8 mx-auto">
+  <div class="mb-6 text-center space-y-1">
+    <p class="text-xs uppercase tracking-wide text-slate-500">Join us</p>
+    <h1 class="text-2xl font-bold text-slate-900">Create account</h1>
+    <p class="text-sm text-slate-600">Browse jobs and apply with your profile.</p>
+  </div>
+
+  <form id="registerForm" class="space-y-4">
+    <div id="registerError" class="text-sm text-red-600 mb-2 hidden"></div>
+    <div class="space-y-2">
+      <label class="text-sm text-slate-600">Full name</label>
+      <input class="border rounded-lg p-3 w-full focus:outline-none focus:ring-2 focus:ring-indigo-200" placeholder="Jane Doe" id="name" required>
+    </div>
+
+    <div class="space-y-2">
+      <label class="text-sm text-slate-600">Email</label>
+      <input class="border rounded-lg p-3 w-full focus:outline-none focus:ring-2 focus:ring-indigo-200" placeholder="you@example.com" id="email" type="email" required>
+    </div>
+
+    <div class="space-y-2">
+      <label class="text-sm text-slate-600">Password</label>
+      <input type="password" class="border rounded-lg p-3 w-full focus:outline-none focus:ring-2 focus:ring-indigo-200" placeholder="Choose a strong password" id="password" required>
+    </div>
+
+    <button class="w-full bg-indigo-600 text-white px-4 py-2.5 rounded-lg hover:bg-indigo-700 transition font-semibold">Register</button>
+  </form>
+
+  <p class="text-sm text-center text-slate-600 mt-6">Already have an account? <a href="/auth/login" class="text-indigo-600 hover:text-indigo-700 font-semibold">Login</a></p>
+</div>
+
+<script src="/javascripts/auth.js"></script>
