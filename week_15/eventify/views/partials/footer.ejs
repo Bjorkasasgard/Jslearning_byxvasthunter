@@ -1,0 +1,38 @@
+<footer class="footer">
+  <div class="container-fluid">
+    <div class="footer__grid">
+      <div class="footer__brand">
+        <div style="font-size: 20px; font-weight: 800; color: white; margin-bottom: 12px;">
+          Eventify
+        </div>
+        <p style="margin: 0; line-height: 1.6; opacity: 0.8;">
+          Platform pemesanan tiket event termudah dan terpercaya. 
+          Temukan konser, seminar, dan hiburan favoritmu di sini.
+        </p>
+      </div>
+
+      <div class="footer__col">
+        <h3>Tentang Eventify</h3>
+        <a href="/">Tentang Kami</a>
+        <a href="/">Blog</a>
+        <a href="/">Karir</a>
+      </div>
+
+      <div class="footer__col">
+        <h3>Layanan</h3>
+        <a href="/">Jelajah Event</a>
+        <% if (isAuthenticated) { %>
+          <a href="/my/orders">Tiket Saya</a>
+        <% } else { %>
+          <a href="/login">Masuk</a>
+          <a href="/register">Daftar</a>
+        <% } %>
+        <a href="#">Pusat Bantuan</a>
+      </div>
+    </div>
+
+    <div class="footer__bottom">
+      &copy; <%= new Date().getFullYear() %> Eventify Project. All rights reserved.
+    </div>
+  </div>
+</footer>

@@ -1,0 +1,36 @@
+<section class="hero">
+  <h1 class="hero__title">My Orders</h1>
+  <p class="hero__subtitle">Your recent purchases and ticket items.</p>
+</section>
+
+<section class="panel" style="margin-top:16px;">
+  <% if (orders.length === 0) { %>
+    <p class="muted" style="margin:0;">No orders yet. Browse <a href="/">events</a> to purchase tickets.</p>
+  <% } else { %>
+    <table class="table">
+      <thead>
+        <tr>
+          <th>Order</th>
+          <th>Created</th>
+          <th>Items</th>
+        </tr>
+      </thead>
+      <tbody>
+        <% orders.forEach(o => { %>
+          <tr>
+            <td>#<%= o.id %></td>
+            <td><%= new Date(o.createdAt).toLocaleString('id-ID') %></td>
+            <td>
+              <% o.items.forEach(it => { %>
+                <div>
+                  <strong><%= it.ticket.event.title %></strong>
+                  <span class="muted"> — qty <%= it.quantity %></span>
+                </div>
+              <% }) %>
+            </td>
+          </tr>
+        <% }) %>
+      </tbody>
+    </table>
+  <% } %>
+</section>

@@ -1,0 +1,86 @@
+<section class="hero">
+  <h1 class="hero__title">Admin Dashboard</h1>
+  <p class="hero__subtitle">Create events, publish tickets, and manage inventory.</p>
+</section>
+
+<section class="split">
+  <div class="panel">
+    <h3 style="margin:0 0 10px;">Create Event</h3>
+    <form class="form" method="POST" action="/admin/events">
+      <div class="field">
+        <label>Title</label>
+        <input name="title" required />
+      </div>
+      <div class="field">
+        <label>Description</label>
+        <textarea name="description" required></textarea>
+      </div>
+      <div class="field">
+        <label>Location</label>
+        <input name="location" required />
+      </div>
+      <div class="field">
+        <label>Date & time</label>
+        <input name="date" type="datetime-local" required />
+      </div>
+      <button class="btn btn--primary" type="submit">Create</button>
+    </form>
+  </div>
+
+  <div class="panel">
+    <h3 style="margin:0 0 10px;">Publish Ticket</h3>
+    <form class="form" method="POST" action="/admin/tickets">
+      <div class="field">
+        <label>Event</label>
+        <select name="eventId" required>
+          <% events.forEach(e => { %>
+            <option value="<%= e.id %>"><%= e.title %></option>
+          <% }) %>
+        </select>
+      </div>
+      <div class="field">
+        <label>Price (IDR)</label>
+        <input name="price" type="number" min="0" required />
+      </div>
+      <div class="field">
+        <label>Quota</label>
+        <input name="quota" type="number" min="1" required />
+      </div>
+      <button class="btn btn--primary" type="submit">Publish</button>
+    </form>
+  </div>
+</section>
+
+<section class="panel" style="margin-top:16px;">
+  <h3 style="margin:0 0 10px;">Events</h3>
+  <% if (events.length === 0) { %>
+    <p class="muted" style="margin:0;">No events created yet.</p>
+  <% } else { %>
+    <table class="table">
+      <thead>
+        <tr>
+          <th>Title</th>
+          <th>Date</th>
+          <th>Location</th>
+          <th>Tickets</th>
+        </tr>
+      </thead>
+      <tbody>
+        <% events.forEach(e => { %>
+          <tr>
+            <td><a href="/event/<%= e.id %>"><%= e.title %></a></td>
+            <td><%= new Date(e.date).toLocaleString('id-ID') %></td>
+            <td><%= e.location %></td>
+            <td>
+              <% if (e.tickets.length === 0) { %>
+                <span class="muted">None</span>
+              <% } else { %>
+                <span><%= e.tickets.length %> published</span>
+              <% } %>
+            </td>
+          </tr>
+        <% }) %>
+      </tbody>
+    </table>
+  <% } %>
+</section>

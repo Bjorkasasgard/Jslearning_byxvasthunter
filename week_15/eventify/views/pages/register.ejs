@@ -1,0 +1,64 @@
+<div class="loket-auth-container">
+  
+  <div class="loket-auth-left">
+   <img src="/images/auth/1.png" alt="Login Illustration" class="loket-illustration">
+    <div class="loket-marketing-text">
+      <h2>Jangan sampai ketinggalan event favoritmu!</h2>
+      <p>Gabung dan rasakan kemudahan beli tiket dan mengelola event di Eventify.</p>
+    </div>
+  </div>
+
+  <div class="loket-auth-right">
+    <div class="loket-form-header">
+      <h1>Buat akun Eventify kamu</h1>
+      <p>Sudah punya akun? <a href="/login">Masuk</a></p>
+    </div>
+
+    <div class="loket-form-card">
+      
+      <% if (typeof errorMessage !== 'undefined' && errorMessage) { %>
+        <div class="auth-alert">
+          <i class="bi bi-exclamation-triangle"></i> <%= errorMessage %>
+        </div>
+      <% } %>
+
+      <form method="POST" action="/register">
+        <div class="loket-input-group">
+          <label for="register-name">Nama Lengkap</label>
+          <input 
+            id="register-name" 
+            name="name" 
+            type="text" 
+            value="<%= (typeof formValues !== 'undefined' && formValues && formValues.name) ? formValues.name : '' %>"
+            required 
+          />
+        </div>
+
+        <div class="loket-input-group">
+          <label for="register-email">Email</label>
+          <input 
+            id="register-email" 
+            name="email" 
+            type="email" 
+            value="<%= (typeof formValues !== 'undefined' && formValues && formValues.email) ? formValues.email : '' %>"
+            required 
+          />
+        </div>
+
+        <div class="loket-input-group">
+          <label for="register-password">Password</label>
+          <input 
+            id="register-password" 
+            name="password" 
+            type="password" 
+            minlength="6"
+            required 
+          />
+        </div>
+
+        <button class="loket-btn-primary" type="submit">Daftar</button>
+      </form>
+    </div>
+  </div>
+
+</div>

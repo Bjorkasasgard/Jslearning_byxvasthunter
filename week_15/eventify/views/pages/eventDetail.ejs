@@ -1,0 +1,68 @@
+<section class="hero">
+  <h1 class="hero__title"><%= event.title %></h1>
+  <p class="hero__subtitle">
+    <span><%= event.location %></span>
+    <span> • </span>
+    <span><%= new Date(event.date).toLocaleString('id-ID', { dateStyle: 'medium', timeStyle: 'short' }) %></span>
+  </p>
+</section>
+
+<section class="split">
+  <div class="panel">
+    <h3 style="margin:0 0 8px;">About this event</h3>
+    <p class="muted" style="margin:0;"><%= event.description %></p>
+
+    <div style="height:14px;"></div>
+
+    <h3 style="margin:0 0 10px;">Tickets</h3>
+    <% if (!tickets || tickets.length === 0) { %>
+      <div class="muted">No tickets published yet.</div>
+    <% } %>
+
+    <table class="table">
+      <thead>
+        <tr>
+          <th>Ticket</th>
+          <th>Price</th>
+          <th>Remaining</th>
+        </tr>
+      </thead>
+      <tbody>
+        <% (tickets || []).forEach((t, idx) => { %>
+          <tr>
+            <td>General Admission #<%= idx + 1 %></td>
+            <td>Rp <%= t.price.toLocaleString('id-ID') %></td>
+            <td><%= t.quota %></td>
+          </tr>
+        <% }) %>
+      </tbody>
+    </table>
+  </div>
+
+  <aside class="panel">
+    <h3 style="margin:0 0 6px;">Checkout</h3>
+    <p class="muted" style="margin:0 0 12px;">Select a ticket and quantity.</p>
+
+    <% if (!isAuthenticated) { %>
+      <div class="alert">
+        You need to <a href="/login">login</a> before purchasing.
+      </div>
+    <% } else { %>
+      <form class="form" method="POST" action="/orders">
+        <div class="field">
+          <label>Ticket</label>
+          <select name="ticketId" required>
+            <% (tickets || []).forEach((t, idx) => { %>
+              <option value="<%= t.id %>">General Admission #<%= idx + 1 %> — Rp <%= t.price.toLocaleString('id-ID') %></option>
+            <% }) %>
+          </select>
+        </div>
+        <div class="field">
+          <label>Quantity</label>
+          <input name="quantity" type="number" min="1" value="1" required />
+        </div>
+        <button class="btn btn--primary" type="submit">Buy ticket</button>
+      </form>
+    <% } %>
+  </aside>
+</section>

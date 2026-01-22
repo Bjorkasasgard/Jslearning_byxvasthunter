@@ -1,0 +1,96 @@
+<section class="banner-strip" aria-label="Banner event">
+  <div class="container banner-container">
+    <div class="banner-track" role="list">
+      <div class="banner-card" id="banner-1" role="listitem" data-index="0">
+        <a href="/" aria-label="Promo event 1">
+          <img src="/images/1.jpg" alt="Banner event 1" />
+        </a>
+      </div>
+      <div class="banner-card" id="banner-2" role="listitem" data-index="1">
+        <a href="/" aria-label="Promo event 2">
+          <img src="/images/2.jpg" alt="Banner event 2" />
+        </a>
+      </div>
+      <div class="banner-card" id="banner-3" role="listitem" data-index="2">
+        <a href="/" aria-label="Promo event 3">
+          <img src="/images/3.jpg" alt="Banner event 3" />
+        </a>
+      </div>
+      <div class="banner-card" id="banner-4" role="listitem" data-index="3">
+        <a href="/" aria-label="Promo event 4">
+          <img src="/images/4.jpg" alt="Banner event 4" />
+        </a>
+      </div>
+      <div class="banner-card" id="banner-5" role="listitem" data-index="4">
+        <a href="/" aria-label="Promo event 5">
+          <img src="/images/5.jpg" alt="Banner event 5" />
+        </a>
+      </div>
+      <div class="banner-card" id="banner-6" role="listitem" data-index="5">
+        <a href="/" aria-label="Promo event 6">
+          <img src="/images/6.jpg" alt="Banner event 6" />
+        </a>
+      </div>
+    </div>
+    <div class="banner-dots" role="tablist" aria-label="Navigasi banner">
+      <a class="banner-dot" href="#banner-1" role="tab" aria-label="Banner 1" data-index="0"></a>
+      <a class="banner-dot" href="#banner-2" role="tab" aria-label="Banner 2" data-index="1"></a>
+      <a class="banner-dot" href="#banner-3" role="tab" aria-label="Banner 3" data-index="2"></a>
+      <a class="banner-dot" href="#banner-4" role="tab" aria-label="Banner 4" data-index="3"></a>
+      <a class="banner-dot" href="#banner-5" role="tab" aria-label="Banner 5" data-index="4"></a>
+      <a class="banner-dot" href="#banner-6" role="tab" aria-label="Banner 6" data-index="5"></a>
+    </div>
+  </div>
+</section>
+
+<section class="container categories" aria-label="Kategori populer">
+  <a class="category-chip" href="/?q=Konser">Konser</a>
+  <a class="category-chip" href="/?q=Seminar">Seminar</a>
+  <a class="category-chip" href="/?q=Workshop">Workshop</a>
+  <a class="category-chip" href="/?q=Festival">Festival</a>
+  <a class="category-chip" href="/?q=Olahraga">Olahraga</a>
+</section>
+
+<section id="events" class="container event-section">
+  <div class="section-head">
+    <h2 class="section-title">Event Populer</h2>
+  </div>
+
+  <% if (!events || events.length === 0) { %>
+    <div class="empty-state">
+      <i class="bi bi-calendar-x"></i>
+      <div>
+        <strong>Belum ada event</strong>
+        <p class="muted">Coba kata kunci lain atau kembali nanti.</p>
+      </div>
+    </div>
+  <% } else { %>
+    <div class="event-grid">
+      <% events.forEach(event => { %>
+        <a href="/event/<%= event.id %> " class="event-card">
+          <div class="event-thumb">
+            <i class="bi bi-calendar-event"></i>
+          </div>
+          <div class="event-details">
+            <h3 class="event-title"><%= event.title %></h3>
+            <div class="event-date">
+              <i class="bi bi-clock"></i>
+              <span><%= new Date(event.date).toLocaleDateString('id-ID', { year: 'numeric', month: 'short', day: '2-digit' }) %></span>
+            </div>
+            <div class="event-location">
+              <i class="bi bi-geo-alt"></i>
+              <span><%= event.location %></span>
+            </div>
+            <div class="event-price">
+              <% if (event.minPrice !== null) { %>
+                Mulai dari Rp <%= Number(event.minPrice).toLocaleString('id-ID') %>
+              <% } else { %>
+                <span class="muted">Tiket belum tersedia</span>
+              <% } %>
+            </div>
+          </div>
+        </a>
+      <% }) %>
+    </div>
+  <% } %>
+</section>

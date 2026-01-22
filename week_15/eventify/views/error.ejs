@@ -1,0 +1,20 @@
+<section class="panel">
+	<h1 style="margin:0 0 6px;">Something went wrong</h1>
+	<p class="muted" style="margin:0;">Status: <%= error.status || 500 %></p>
+	<div class="alert" style="margin-top:14px;">
+		<%= message %>
+	</div>
+
+	<% if (error && error.stack) { %>
+		<details style="margin-top:14px;" class="muted">
+			<summary>Debug details</summary>
+			<pre style="white-space:pre-wrap;">
+<%= error.stack %>
+			</pre>
+		</details>
+	<% } %>
+
+	<div style="margin-top:14px;">
+		<a class="btn btn--ghost" href="/">Back to home</a>
+	</div>
+</section>

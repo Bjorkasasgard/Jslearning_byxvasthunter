@@ -1,0 +1,52 @@
+<div class="loket-auth-container">
+  
+  <div class="loket-auth-left">
+    <img src="/images/auth/1.png" alt="Login Illustration" class="loket-illustration">
+    <div class="loket-marketing-text">
+      <h2>Waktunya bersenang-senang lagi!</h2>
+      <p>Login untuk melanjutkan pembelian tiket atau mengelola event kamu dengan lebih cepat.</p>
+    </div>
+  </div>
+
+  <div class="loket-auth-right">
+    <div class="loket-form-header">
+      <h1>Masuk ke Eventify</h1>
+      <p>Belum punya akun? <a href="/register">Daftar</a></p>
+    </div>
+
+    <div class="loket-form-card">
+      
+      <% if (typeof errorMessage !== 'undefined' && errorMessage) { %>
+        <div class="auth-alert">
+          <i class="bi bi-exclamation-triangle"></i> <%= errorMessage %>
+        </div>
+      <% } %>
+
+      <form method="POST" action="/login">
+        <div class="loket-input-group">
+          <label for="login-email">Email</label>
+          <input 
+            id="login-email" 
+            name="email" 
+            type="email" 
+            value="<%= (typeof formValues !== 'undefined' && formValues && formValues.email) ? formValues.email : '' %>"
+            required 
+          />
+        </div>
+
+        <div class="loket-input-group">
+          <label for="login-password">Password</label>
+          <input 
+            id="login-password" 
+            name="password" 
+            type="password" 
+            required 
+          />
+        </div>
+
+        <button class="loket-btn-primary" type="submit">Masuk</button>
+      </form>
+    </div>
+  </div>
+
+</div>

@@ -1,0 +1,60 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+enum Role {
+  USER
+  ADMIN
+}
+
+model User {
+  id        Int      @id @default(autoincrement())
+  name      String
+  email     String   @unique
+  password  String
+  role      Role     @default(USER)
+  orders    Order[]
+  createdAt DateTime @default(now())
+}
+
+model Event {
+  id          Int      @id @default(autoincrement())
+  title       String
+  description String
+  location    String
+  date        DateTime
+  tickets     Ticket[]
+  createdAt   DateTime @default(now())
+}
+
+model Ticket {
+  id        Int     @id @default(autoincrement())
+  eventId   Int
+  price     Int
+  quota     Int
+  event     Event   @relation(fields: [eventId], references: [id])
+  orderItems OrderItem[]
+}
+
+model Order {
+  id        Int      @id @default(autoincrement())
+  userId    Int
+  user      User     @relation(fields: [userId], references: [id])
+  items     OrderItem[]
+  createdAt DateTime @default(now())
+}
+
+model OrderItem {
+  id        Int    @id @default(autoincrement())
+  orderId  Int
+  ticketId Int
+  quantity Int
+
+  order  Order  @relation(fields: [orderId], references: [id])
+  ticket Ticket @relation(fields: [ticketId], references: [id])
+}
