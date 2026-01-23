@@ -1,9 +1,12 @@
 const prisma = require("../prisma/client");
+const crypto = require("crypto");
 
 exports.createOrder = async (userId, items) => {
   return prisma.$transaction(async (tx) => {
+    const qrToken = crypto.randomBytes(16).toString("hex");
+
     const order = await tx.order.create({
-      data: { userId },
+      data: { userId, status: "UNPAID", qrToken },
     });
 
     for (const item of items) {

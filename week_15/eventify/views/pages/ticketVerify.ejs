@@ -1,0 +1,48 @@
+<div class="verify-page">
+  <div class="verify-card">
+    <header class="verify-header">
+      <div>
+        <h1>Validasi Tiket</h1>
+        <p>Eventify • Ticket Verification</p>
+      </div>
+      <span class="verify-status <%= String(order.status).toUpperCase() === 'PAID' ? 'valid' : 'invalid' %>">
+        <i class="bi <%= String(order.status).toUpperCase() === 'PAID' ? 'bi-shield-check' : 'bi-shield-x' %>"></i>
+        <%= String(order.status).toUpperCase() === 'PAID' ? 'VALID' : 'UNPAID' %>
+      </span>
+    </header>
+
+    <section class="verify-body">
+      <div class="verify-row">
+        <span class="label">Order</span>
+        <strong>#<%= order.id %></strong>
+      </div>
+      <div class="verify-row">
+        <span class="label">Nama Pembeli</span>
+        <strong><%= buyer && buyer.name ? buyer.name : (buyer && buyer.email ? buyer.email : '-') %></strong>
+      </div>
+      <div class="verify-row">
+        <span class="label">Email</span>
+        <strong><%= buyer && buyer.email ? buyer.email : '-' %></strong>
+      </div>
+      <div class="verify-row">
+        <span class="label">Tanggal Pesan</span>
+        <strong><%= new Date(order.createdAt).toLocaleString('id-ID') %></strong>
+      </div>
+    </section>
+
+    <section class="verify-event">
+      <h3>Event</h3>
+      <% (order.items || []).forEach(it => { %>
+        <div class="verify-event-item">
+          <div>
+            <strong><%= it.ticket.event.title %></strong>
+            <div class="muted"><i class="bi bi-geo-alt"></i> <%= it.ticket.event.location %></div>
+            <div class="muted"><i class="bi bi-calendar-event"></i> <%= new Date(it.ticket.event.date).toLocaleString('id-ID', { dateStyle: 'medium', timeStyle: 'short' }) %></div>
+            <div class="muted"><i class="bi bi-ticket-perforated"></i> <%= it.ticket.name || 'General Admission' %></div>
+          </div>
+          <div class="qty">x<%= it.quantity %></div>
+        </div>
+      <% }) %>
+    </section>
+  </div>
+</div>

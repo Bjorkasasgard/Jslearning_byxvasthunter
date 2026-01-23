@@ -6,6 +6,8 @@
     "dev": "nodemon ./bin/www",
     "dev:server": "nodemon ./bin/www",
     "start": "node ./bin/www",
+    "seed": "node prisma/seed.js",
+    "superadmin": "node scripts/createSuperAdmin.js",
     "prisma": "prisma",
     "test": "jest --runInBand",
     "security:audit": "npm audit",
@@ -26,6 +28,7 @@
     "http-errors": "~1.6.3",
     "jsonwebtoken": "^9.0.3",
     "morgan": "~1.9.1",
+    "multer": "^2.0.0",
     "nodemon": "^3.1.11",
     "sqlite": "^5.1.1",
     "joi": "^17.11.0"

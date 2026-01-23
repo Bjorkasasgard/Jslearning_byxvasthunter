@@ -1,0 +1,313 @@
+<div class="admin-wrapper">
+  <aside class="admin-sidebar">
+    <div class="sidebar-header">
+      <div class="sidebar-brand">
+        <span>Eventify</span>
+      </div>
+    </div>
+    
+    <nav class="sidebar-nav">
+      <p class="nav-label">Menu Utama</p>
+      <a href="#dashboard" class="nav-link active">
+        <i class="bi bi-grid-1x2-fill"></i> Dashboard
+      </a>
+      <a href="#create-event" class="nav-link">
+        <i class="bi bi-calendar-plus-fill"></i> Buat Event
+      </a>
+      <a href="#publish-ticket" class="nav-link">
+        <i class="bi bi-ticket-perforated-fill"></i> Kelola Tiket
+      </a>
+      <a href="#orders-monitoring" class="nav-link">
+        <i class="bi bi-receipt"></i> Monitoring Pesanan
+      </a>
+      
+      <p class="nav-label">Data</p>
+      <a href="#event-list" class="nav-link">
+        <i class="bi bi-collection-fill"></i> Daftar Event
+      </a>
+    </nav>
+
+    <div class="sidebar-footer">
+      <a href="/" class="nav-link-secondary">
+        <i class="bi bi-box-arrow-up-right"></i> Lihat Website
+      </a>
+      <form method="POST" action="/api/auth/logout">
+        <button type="submit" class="btn-logout">
+          <i class="bi bi-power"></i> Logout
+        </button>
+      </form>
+    </div>
+  </aside>
+
+  <main class="admin-content">
+    <% const stats = (typeof orderStats !== 'undefined' && orderStats) ? orderStats : { total: 0, paid: 0, unpaid: 0 }; %>
+    
+    <header class="admin-header">
+      <div class="header-title">
+        <h1>Selamat Datang, Admin!</h1>
+        <p>Ringkasan aktivitas dan pengelolaan event Anda hari ini.</p>
+      </div>
+      <div class="header-user">
+        <div class="user-avatar">A</div>
+      </div>
+    </header>
+
+    <section id="dashboard" class="stats-grid">
+      <div class="stat-card blue">
+        <div class="stat-icon"><i class="bi bi-calendar-check"></i></div>
+        <div class="stat-info">
+          <span>Total Event</span>
+          <h3><%= events.length %></h3>
+        </div>
+      </div>
+      <div class="stat-card green">
+        <div class="stat-icon"><i class="bi bi-ticket-detailed"></i></div>
+        <div class="stat-info">
+          <span>Total Tiket Aktif</span>
+          <h3><%= events.reduce((acc, e) => acc + (e.tickets || []).length, 0) %></h3>
+        </div>
+      </div>
+      <div class="stat-card purple">
+        <div class="stat-icon"><i class="bi bi-receipt"></i></div>
+        <div class="stat-info">
+          <span>Total Pesanan</span>
+          <h3><%= stats.total %></h3>
+        </div>
+      </div>
+    </section>
+
+    <section class="forms-grid">
+      
+      <div id="create-event" class="card-panel">
+        <div class="card-header">
+          <h3><i class="bi bi-plus-circle"></i> Buat Event Baru</h3>
+        </div>
+        <div class="card-body">
+          <form class="styled-form" method="POST" action="/admin/events" enctype="multipart/form-data">
+            <div class="form-group">
+              <label>Nama Event</label>
+              <input name="title" type="text" placeholder="Contoh: Konser Musik 2026" required />
+            </div>
+            
+            <div class="form-row">
+              <div class="form-group">
+                <label>Tanggal & Waktu</label>
+                <input name="date" type="datetime-local" required />
+              </div>
+              <div class="form-group">
+                <label>Lokasi</label>
+                <input name="location" type="text" placeholder="Nama Gedung / Kota" required />
+              </div>
+            </div>
+
+            <div class="form-group">
+              <label>Deskripsi</label>
+              <textarea name="description" rows="4" placeholder="Jelaskan detail event..." required></textarea>
+            </div>
+
+            <div class="form-group">
+              <label>Poster Event</label>
+              <div class="file-input-wrapper">
+                <input name="imageFile" type="file" accept="image/*" />
+              </div>
+            </div>
+
+            <button class="btn-primary" type="submit">Simpan Event</button>
+          </form>
+        </div>
+      </div>
+
+      <div id="publish-ticket" class="card-panel">
+        <div class="card-header">
+          <h3><i class="bi bi-tags"></i> Publikasi Tiket</h3>
+        </div>
+        <div class="card-body">
+          <form class="styled-form" method="POST" action="/admin/tickets">
+            <div class="form-group">
+              <label>Pilih Event</label>
+              <select name="eventId" required>
+                <option value="" disabled selected>-- Pilih Event --</option>
+                <% events.forEach(e => { %>
+                  <option value="<%= e.id %>"><%= e.title %></option>
+                <% }) %>
+              </select>
+            </div>
+
+            <div class="form-group">
+              <label>Nama Tiket</label>
+              <input name="name" type="text" placeholder="Contoh: VIP, Regular" required />
+            </div>
+
+            <div class="form-group">
+              <label>Harga Tiket (IDR)</label>
+              <div class="input-group">
+                <span class="prefix">Rp</span>
+                <input name="price" type="number" min="0" placeholder="0" required />
+              </div>
+            </div>
+
+            <div class="form-group">
+              <label>Kuota Tiket</label>
+              <input name="quota" type="number" min="1" placeholder="Jumlah tiket tersedia" required />
+            </div>
+
+            <button class="btn-secondary" type="submit">Terbitkan Tiket</button>
+          </form>
+
+          <div class="info-box">
+            <i class="bi bi-info-circle-fill"></i>
+            <p>Pastikan event sudah dibuat sebelum menambahkan tiket.</p>
+          </div>
+        </div>
+      </div>
+
+    </section>
+
+    <section id="event-list" class="card-panel full-width">
+      <div class="card-header flex-between">
+        <h3>Daftar Event Aktif</h3>
+        <span class="badge"><%= events.length %> Event</span>
+      </div>
+      
+      <div class="card-body p-0">
+        <% if (events.length === 0) { %>
+          <div class="empty-state">
+            <img src="https://www.svgrepo.com/show/276264/monster.svg" alt="Monster empty state" style="width: 160px; opacity: 0.75;">
+            <h4>Belum ada data</h4>
+            <p>Silakan buat event pertama Anda.</p>
+          </div>
+        <% } else { %>
+          <div class="table-responsive">
+            <table class="admin-table">
+              <thead>
+                <tr>
+                  <th>Judul Event</th>
+                  <th>Tanggal</th>
+                  <th>Lokasi</th>
+                  <th>Tiket</th>
+                  <th>Aksi</th>
+                </tr>
+              </thead>
+              <tbody>
+                <% events.forEach(e => { %>
+                  <tr>
+                    <td>
+                      <div class="event-cell">
+                        <div class="event-icon"><i class="bi bi-calendar-event"></i></div>
+                        <strong><%= e.title %></strong>
+                      </div>
+                    </td>
+                    <td><%= new Date(e.date).toLocaleString('id-ID', { dateStyle: 'medium', timeStyle: 'short' }) %></td>
+                    <td><%= e.location %></td>
+                    <td>
+                      <span class="status-badge success"><%= e.tickets ? e.tickets.length : 0 %> Jenis</span>
+                    </td>
+                    <td>
+                      <a href="/event/<%= e.id %>" class="btn-icon" title="Lihat"><i class="bi bi-eye"></i></a>
+                      </td>
+                  </tr>
+                <% }) %>
+              </tbody>
+            </table>
+          </div>
+        <% } %>
+      </div>
+    </section>
+
+    <section id="orders-monitoring" class="card-panel full-width">
+      <div class="card-header flex-between">
+        <h3>Monitoring Pesanan</h3>
+        <div class="header-badges">
+          <span class="badge"><%= (orders || []).length %> Pesanan</span>
+          <span class="badge badge-success">Paid: <%= stats.paid %></span>
+          <span class="badge badge-danger">Unpaid: <%= stats.unpaid %></span>
+        </div>
+      </div>
+
+      <div class="card-body p-0">
+        <% if (!orders || orders.length === 0) { %>
+          <div class="empty-state">
+            <img src="https://www.svgrepo.com/show/493837/receipt.svg" alt="Empty" style="width: 160px; opacity: 0.75;">
+            <h4>Belum ada pesanan</h4>
+            <p>Pesanan tiket untuk event Anda akan muncul di sini.</p>
+          </div>
+        <% } else { %>
+          <div class="table-responsive">
+            <table class="admin-table">
+              <thead>
+                <tr>
+                  <th>Order</th>
+                  <th>Event</th>
+                  <th>Pemesan</th>
+                  <th>Qty</th>
+                  <th>Total</th>
+                  <th>Status</th>
+                  <th>Aksi</th>
+                </tr>
+              </thead>
+              <tbody>
+                <% orders.forEach(o => { %>
+                  <tr>
+                    <td>
+                      <div class="event-cell">
+                        <div class="event-icon"><i class="bi bi-receipt"></i></div>
+                        <strong>#<%= o.id %></strong>
+                      </div>
+                      <div class="text-muted-sm"><%= new Date(o.createdAt).toLocaleString('id-ID') %></div>
+                    </td>
+                    <td>
+                      <strong><%= o.eventTitle %></strong>
+                    </td>
+                    <td>
+                      <div><strong><%= o.user && o.user.name ? o.user.name : 'User' %></strong></div>
+                      <div class="text-muted-sm"><%= o.user && o.user.email ? o.user.email : '-' %></div>
+                    </td>
+                    <td><span class="badge"><%= o.totalQty %></span></td>
+                    <td><strong>Rp <%= (typeof o.totalPrice === 'number' ? o.totalPrice : 0).toLocaleString('id-ID') %></strong></td>
+                    <td>
+                      <span class="status-badge status-<%= String(o.status).toLowerCase() %>">
+                        <%= o.status %>
+                      </span>
+                    </td>
+                    <td>
+                      <div class="status-actions">
+                        <form method="POST" action="/admin/orders/<%= o.id %>/status">
+                          <input type="hidden" name="status" value="PAID" />
+                          <button type="submit" class="btn-pill success" title="Tandai Paid" <%= String(o.status).toUpperCase() === 'PAID' ? 'disabled' : '' %>>
+                            <i class="bi bi-check-circle"></i> Paid
+                          </button>
+                        </form>
+                        <form method="POST" action="/admin/orders/<%= o.id %>/status">
+                          <input type="hidden" name="status" value="UNPAID" />
+                          <button type="submit" class="btn-pill danger" title="Tandai Unpaid" <%= String(o.status).toUpperCase() === 'UNPAID' ? 'disabled' : '' %>>
+                            <i class="bi bi-x-circle"></i> Unpaid
+                          </button>
+                        </form>
+                      </div>
+                    </td>
+                  </tr>
+                <% }) %>
+              </tbody>
+            </table>
+          </div>
+        <% } %>
+      </div>
+    </section>
+
+    <footer class="admin-footer">
+      &copy; <%= new Date().getFullYear() %> Eventify Admin Panel.
+    </footer>
+
+  </main>
+</div>
+
+<script>
+  // Simple script to highlight active sidebar link
+  const links = document.querySelectorAll('.sidebar-nav .nav-link');
+  links.forEach(link => {
+    link.addEventListener('click', function() {
+      links.forEach(l => l.classList.remove('active'));
+      this.classList.add('active');
+    });
+  });
+</script>

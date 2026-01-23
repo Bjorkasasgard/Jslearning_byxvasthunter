@@ -6,7 +6,7 @@ exports.register = Joi.object({
     "string.min": "Nama minimal 3 karakter.",
     "any.required": "Nama lengkap wajib diisi.",
   }),
-  email: Joi.string().email().required().messages({
+  email: Joi.string().email({ tlds: { allow: false } }).required().messages({
     "string.empty": "Email wajib diisi.",
     "string.email": "Format email tidak valid.",
     "any.required": "Email wajib diisi.",
@@ -19,7 +19,7 @@ exports.register = Joi.object({
 });
 
 exports.login = Joi.object({
-  email: Joi.string().email().required().messages({
+  email: Joi.string().email({ tlds: { allow: false } }).required().messages({
     "string.empty": "Email wajib diisi.",
     "string.email": "Format email tidak valid.",
     "any.required": "Email wajib diisi.",

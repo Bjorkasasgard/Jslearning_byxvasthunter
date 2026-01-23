@@ -1,36 +1,217 @@
-<section class="hero">
-  <h1 class="hero__title">My Orders</h1>
-  <p class="hero__subtitle">Your recent purchases and ticket items.</p>
+<section class="hero orders-hero">
+  <div class="container">
+    <h1 class="hero__title">Tiket & Pesanan Saya</h1>
+    <p class="hero__subtitle">Hai! Kelola semua riwayat transaksi dan akses tiket eventmu di sini.</p>
+  </div>
 </section>
 
-<section class="panel" style="margin-top:16px;">
+<section class="orders-section container">
+  <% if (typeof query !== 'undefined' && query.success) { %>
+    <div class="event-alert event-alert--success animate-fade-in" role="alert">
+      <div class="alert-content">
+        <i class="bi bi-patch-check-fill" style="font-size: 1.2rem;"></i>
+        <div>
+          <strong>Pembayaran Berhasil!</strong>
+          <span style="display:block; font-size:13px; margin-top:2px;">Terima kasih, tiketmu sudah aman. ID Pesanan: <strong>#<%= query.orderId %></strong></span>
+        </div>
+      </div>
+    </div>
+  <% } %>
+
   <% if (orders.length === 0) { %>
-    <p class="muted" style="margin:0;">No orders yet. Browse <a href="/">events</a> to purchase tickets.</p>
+    <div class="orders-empty">
+      <img src="/img/empty-orders.svg" alt="Belum ada pesanan" class="empty-img">
+      <div>
+        <h3>Kamu belum memiliki tiket aktif</h3>
+        <p>Jangan lewatkan momen seru! Yuk, cari event favoritmu sekarang.</p>
+      </div>
+      <a href="/" class="btn-primary" style="margin-top: 12px;">
+        <i class="bi bi-search"></i> Jelajahi Event
+      </a>
+    </div>
   <% } else { %>
-    <table class="table">
-      <thead>
-        <tr>
-          <th>Order</th>
-          <th>Created</th>
-          <th>Items</th>
-        </tr>
-      </thead>
-      <tbody>
-        <% orders.forEach(o => { %>
-          <tr>
-            <td>#<%= o.id %></td>
-            <td><%= new Date(o.createdAt).toLocaleString('id-ID') %></td>
-            <td>
-              <% o.items.forEach(it => { %>
-                <div>
-                  <strong><%= it.ticket.event.title %></strong>
-                  <span class="muted"> — qty <%= it.quantity %></span>
+    
+    <div class="orders-list">
+      <% orders.forEach(o => { %>
+        <% 
+           // --- LOGIC UI/UX: Normalisasi Status & Teks ---
+           const rawStatus = (o && o.status) ? o.status.toLowerCase() : 'unpaid';
+           let displayStatus = 'Menunggu Pembayaran';
+           let badgeClass = 'pending'; // css class: status-pending
+           let iconClass = 'bi-hourglass-split';
+           let statusMessage = 'Selesaikan pembayaran agar tiketmu aman.';
+
+           // Cek Status Lunas
+           if (['paid', 'settlement', 'success', 'capture'].includes(rawStatus)) {
+             displayStatus = 'Lunas / Tiket Aktif';
+             badgeClass = 'paid'; // css class: status-paid
+             iconClass = 'bi-check-circle-fill';
+             statusMessage = 'Tiket sudah siap digunakan.';
+           } 
+           // Cek Status Gagal/Batal
+           else if (['expire', 'cancel', 'failure', 'deny'].includes(rawStatus)) {
+             displayStatus = 'Dibatalkan / Kadaluarsa';
+             badgeClass = 'cancelled'; // css class: status-cancelled
+             iconClass = 'bi-x-circle-fill';
+             statusMessage = 'Pesanan ini tidak dapat dilanjutkan.';
+           }
+
+           // Data Helper untuk Link Event
+           const firstItem = (o.items && o.items.length) ? o.items[0] : null;
+           const eventData = firstItem ? firstItem.ticket.event : null;
+           const eventId = eventData ? eventData.id : '#';
+           const eventLink = eventId !== '#' ? `/event/${eventId}` : '#';
+           
+           // Fallback image handling
+           const eventImg = (eventData && (eventData.imageSrc || eventData.imageUrl)) 
+                            ? (eventData.imageSrc || eventData.imageUrl) 
+                            : '/images/placeholder-event.jpg'; 
+        %>
+
+        <article class="orders-card">
+          <header class="orders-card__header">
+            <div class="header-info">
+              <div class="orders-id">
+                <i class="bi bi-receipt"></i> Order ID: <strong>#<%= o.id %></strong>
+              </div>
+              <div class="orders-date">
+                Dipesan pada <%= new Date(o.createdAt).toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric', hour: '2-digit', minute: '2-digit' }) %> WIB
+              </div>
+            </div>
+            
+            <div class="status-badge status-<%= badgeClass %>">
+              <i class="<%= iconClass %>"></i> <%= displayStatus %>
+            </div>
+          </header>
+
+          <div class="orders-body">
+            <% o.items.forEach(it => { %>
+              <div class="orders-item">
+                <div class="item-img-wrapper">
+                  <a href="<%= eventLink %>">
+                    <img src="<%= eventImg %>" alt="<%= it.ticket.event.title %>" loading="lazy">
+                  </a>
                 </div>
-              <% }) %>
-            </td>
-          </tr>
-        <% }) %>
-      </tbody>
-    </table>
+                <div class="item-details">
+                  <h4 class="event-title">
+                    <a href="<%= eventLink %>" style="text-decoration: none; color: inherit;">
+                      <%= it.ticket.event.title %>
+                    </a>
+                  </h4>
+                  <div class="event-meta">
+                    <span><i class="bi bi-geo-alt-fill" style="color:var(--text-muted)"></i> <%= it.ticket.event.location %></span>
+                  </div>
+                  <div class="ticket-info">
+                    <span class="qty"><i class="bi bi-ticket-perforated"></i> <%= it.quantity %> Tiket</span>
+                    <span class="price">Rp <%= it.ticket.price.toLocaleString('id-ID') %></span>
+                  </div>
+                </div>
+              </div>
+            <% }) %>
+          </div>
+
+          <footer class="orders-card__footer">
+            <div class="total-section">
+              <span class="label">Total Tagihan</span>
+              <span class="total-amount">Rp <%= (o.totalPrice || 0).toLocaleString('id-ID') %></span>
+              <small style="font-size: 11px; color: var(--text-muted); margin-top: 2px;"><%= statusMessage %></small>
+            </div>
+
+            <div class="action-buttons">
+              <a href="<%= eventLink %>" class="btn-outline">
+                Detail Event
+              </a>
+
+              <% if (['paid', 'settlement', 'success', 'capture'].includes(rawStatus)) { %>
+                <a href="/my/orders/<%= o.id %>/receipt" target="_blank" class="btn-primary">
+                  <i class="bi bi-qr-code"></i> Lihat E-Ticket
+                </a>
+              <% } else if (['pending', 'unpaid'].includes(rawStatus)) { %>
+                <a href="<%= eventLink %>" class="btn-primary" style="background-color: #f59e0b; border-color: #f59e0b;">
+                  <i class="bi bi-credit-card-2-front"></i> Lanjut Bayar
+                </a>
+              <% } else { %>
+                <a href="<%= eventLink %>" class="btn-outline" style="border-color: var(--loket-blue-bright); color: var(--loket-blue-bright);">
+                  <i class="bi bi-arrow-repeat"></i> Pesan Lagi
+                </a>
+              <% } %>
+            </div>
+          </footer>
+        </article>
+      <% }) %>
+    </div>
+  <% } %>
+</section>
+
+<section class="orders-dialogue">
+  <div class="orders-dialogue__content">
+    <div>
+      <h3>Intip lainnya di sini yuk</h3>
+      <p>Temukan event menarik lainnya yang mungkin kamu suka.</p>
+    </div>
+    <a class="btn-outline" href="/">Jelajahi Event</a>
+  </div>
+</section>
+
+<% const recEvents = (typeof recommendedEvents !== 'undefined' && recommendedEvents) ? recommendedEvents : []; %>
+<section class="container event-section orders-recommend">
+  <div class="section-head">
+    <h2 class="section-title">Rekomendasi Pilihan</h2>
+  </div>
+
+  <% if (recEvents && recEvents.length) { %>
+    <div class="event-grid">
+      <% recEvents.forEach(event => { %>
+        <a href="/event/<%= event.id %>" class="event-card">
+          <div class="event-thumb">
+            <% if (event.imageSrc) { %>
+              <img src="<%= event.imageSrc %>" alt="<%= event.title %>" loading="lazy" />
+            <% } else { %>
+              <div style="display: flex; align-items: center; justify-content: center; height: 100%; background: #f1f5f9; color: #94a3b8;">
+                <i class="bi bi-calendar-event" style="font-size: 32px;"></i>
+              </div>
+            <% } %>
+          </div>
+          
+          <div class="event-details">
+            <h3 class="event-title"><%= event.title %></h3>
+            
+            <div class="event-date">
+              <i class="bi bi-calendar4-event"></i>
+              <span><%= new Date(event.date).toLocaleDateString('id-ID', { day: 'numeric', month: 'short', year: 'numeric' }) %></span>
+            </div>
+            
+            <div class="event-location">
+              <i class="bi bi-geo-alt"></i>
+              <span><%= event.location %></span>
+            </div>
+
+            <div class="event-price">
+              <% if (event.minPrice !== null && event.minPrice !== undefined) { %>
+                Mulai Rp <%= Number(event.minPrice).toLocaleString('id-ID') %>
+              <% } else { %>
+                <span class="muted">Info Harga Tiket</span>
+              <% } %>
+            </div>
+
+            <div class="event-creator">
+              <div class="event-creator__avatar">
+                <% if (event.creatorAvatar) { %>
+                  <img src="<%= event.creatorAvatar %>" alt="Creator" />
+                <% } else { %>
+                  <i class="bi bi-person-circle"></i>
+                <% } %>
+              </div>
+              <span><%= event.creatorName || 'Penyelenggara' %></span>
+            </div>
+          </div>
+        </a>
+      <% }) %>
+    </div>
+  <% } else { %>
+    <div class="orders-empty" style="padding: 20px; border: none; background: transparent; min-height: unset;">
+      <i class="bi bi-stars" style="font-size: 24px;"></i>
+      <p>Belum ada rekomendasi baru saat ini. Cek lagi nanti ya!</p>
+    </div>
   <% } %>
 </section>

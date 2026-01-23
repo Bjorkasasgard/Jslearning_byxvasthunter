@@ -25,7 +25,7 @@
         <span>Jelajahi Event</span>
       </a>
       
-      <% if (isAuthenticated) { %>
+      <% if (isAuthenticated && !(typeof isAdmin !== 'undefined' && isAdmin)) { %>
         <a class="nav__link" href="/my/orders">
           <i class="bi bi-receipt" aria-hidden="true"></i>
           <span>Tiket Saya</span>
@@ -57,14 +57,16 @@
           </button>
 
           <div class="user-menu__dropdown" role="menu">
-            <a class="user-menu__item" href="/my/orders" role="menuitem">
-              <i class="bi bi-receipt"></i>
-              Tiket Saya
-            </a>
+            <% if (!(typeof isAdmin !== 'undefined' && isAdmin)) { %>
+              <a class="user-menu__item" href="/my/orders" role="menuitem">
+                <i class="bi bi-receipt"></i>
+                Tiket Saya
+              </a>
+            <% } %>
             <% if (typeof isAdmin !== 'undefined' && isAdmin) { %>
               <a class="user-menu__item" href="/admin" role="menuitem">
                 <i class="bi bi-speedometer2"></i>
-                Admin Dashboard
+                Beralih ke Dashboard Admin
               </a>
             <% } %>
             <div class="user-menu__divider"></div>

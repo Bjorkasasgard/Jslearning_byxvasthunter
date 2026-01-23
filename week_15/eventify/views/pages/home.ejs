@@ -43,13 +43,13 @@
   </div>
 </section>
 
-<section class="container categories" aria-label="Kategori populer">
+<!-- <section class="container categories" aria-label="Kategori populer">
   <a class="category-chip" href="/?q=Konser">Konser</a>
   <a class="category-chip" href="/?q=Seminar">Seminar</a>
   <a class="category-chip" href="/?q=Workshop">Workshop</a>
   <a class="category-chip" href="/?q=Festival">Festival</a>
   <a class="category-chip" href="/?q=Olahraga">Olahraga</a>
-</section>
+</section> -->
 
 <section id="events" class="container event-section">
   <div class="section-head">
@@ -57,19 +57,16 @@
   </div>
 
   <% if (!events || events.length === 0) { %>
-    <div class="empty-state">
-      <i class="bi bi-calendar-x"></i>
-      <div>
-        <strong>Belum ada event</strong>
-        <p class="muted">Coba kata kunci lain atau kembali nanti.</p>
-      </div>
-    </div>
   <% } else { %>
     <div class="event-grid">
       <% events.forEach(event => { %>
         <a href="/event/<%= event.id %> " class="event-card">
           <div class="event-thumb">
-            <i class="bi bi-calendar-event"></i>
+            <% if (event.imageSrc) { %>
+              <img src="<%= event.imageSrc %>" alt="<%= event.title %>" />
+            <% } else { %>
+              <i class="bi bi-calendar-event"></i>
+            <% } %>
           </div>
           <div class="event-details">
             <h3 class="event-title"><%= event.title %></h3>
@@ -87,6 +84,16 @@
               <% } else { %>
                 <span class="muted">Tiket belum tersedia</span>
               <% } %>
+            </div>
+            <div class="event-creator">
+              <div class="event-creator__avatar">
+                <% if (event.creatorAvatar) { %>
+                  <img src="<%= event.creatorAvatar %>" alt="<%= event.creatorName || 'Creator' %>" />
+                <% } else { %>
+                  <i class="bi bi-person-circle"></i>
+                <% } %>
+              </div>
+              <span><%= event.creatorName || 'Eventify Admin' %></span>
             </div>
           </div>
         </a>

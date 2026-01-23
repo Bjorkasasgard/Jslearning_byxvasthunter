@@ -1,0 +1,55 @@
+<section class="hero orders-hero">
+  <h1 class="hero__title">Detail Pesanan</h1>
+  <p class="hero__subtitle">Informasi lengkap pembelian tiketmu.</p>
+</section>
+
+<section class="orders-section">
+  <div class="orders-list">
+    <article class="orders-card">
+      <header class="orders-card__header">
+        <div class="header-info">
+          <span class="orders-id">#<%= order.id %></span>
+          <span class="orders-date">
+            <%= new Date(order.createdAt).toLocaleDateString('id-ID', { day: 'numeric', month: 'short', year: 'numeric' }) %>
+          </span>
+        </div>
+        <span class="status-badge status-<%= String(order.status).toLowerCase() %>">
+          <%= order.status %>
+        </span>
+      </header>
+
+      <div class="orders-body">
+        <% (order.items || []).forEach(it => { %>
+          <div class="orders-item">
+            <div class="item-img-wrapper">
+              <img src="<%= (it.ticket.event && (it.ticket.event.imageSrc || it.ticket.event.imageUrl)) ? (it.ticket.event.imageSrc || it.ticket.event.imageUrl) : '/images/1.jpg' %>" alt="Thumbnail">
+            </div>
+            <div class="item-details">
+              <h4 class="event-title"><%= it.ticket.event.title %></h4>
+              <p class="event-meta">
+                <i class="bi bi-geo-alt"></i>
+                <%= it.ticket.event.location %>
+              </p>
+              <div class="ticket-info">
+                <span class="qty">x<%= it.quantity %> Tiket</span>
+                <span class="price">Rp <%= it.ticket.price.toLocaleString('id-ID') %></span>
+              </div>
+            </div>
+          </div>
+        <% }) %>
+      </div>
+
+      <footer class="orders-card__footer">
+        <div class="total-section">
+          <span class="label">Total Pembayaran</span>
+          <span class="total-amount">Rp <%= (typeof order.totalPrice === 'number' ? order.totalPrice : 0).toLocaleString('id-ID') %></span>
+        </div>
+        <div class="action-buttons">
+          <a href="/my/orders" class="btn-outline">
+            <i class="bi bi-arrow-left"></i> Kembali
+          </a>
+        </div>
+      </footer>
+    </article>
+  </div>
+</section>

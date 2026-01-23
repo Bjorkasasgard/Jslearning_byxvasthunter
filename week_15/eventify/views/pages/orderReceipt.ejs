@@ -1,0 +1,90 @@
+<% const buyerData = (order && order.user) ? order.user : ((typeof buyer !== 'undefined' && buyer) ? buyer : (typeof user !== 'undefined' ? user : null)); %>
+<% const qrTokenValue = (typeof qrToken !== 'undefined' && qrToken) ? qrToken : (order && order.qrToken ? order.qrToken : ''); %>
+<% const originUrl = (typeof baseUrl !== 'undefined' && baseUrl) ? baseUrl : 'http://localhost:3000'; %>
+<div class="receipt-page">
+  <div class="receipt-card">
+    <header class="receipt-header">
+      <div>
+        <h1>Struk Tiket</h1>
+        <p>Eventify • Bukti Pembayaran</p>
+      </div>
+      <div class="receipt-meta">
+        <div><strong>Order</strong> #<%= order.id %></div>
+        <div><strong>Tanggal Pesan</strong> <%= new Date(order.createdAt).toLocaleString('id-ID') %></div>
+        <div><strong>Status</strong> <span class="status-badge status-paid">PAID</span></div>
+      </div>
+    </header>
+
+    <section class="receipt-summary">
+      <div class="summary-left">
+        <h3>Rincian Pemesanan</h3>
+        <div class="summary-grid">
+          <div>
+            <span class="label">Nama Pembeli</span>
+            <strong><%= buyerData && buyerData.name ? buyerData.name : (buyerData && buyerData.email ? buyerData.email : '-') %></strong>
+          </div>
+          <div>
+            <span class="label">Email</span>
+            <strong><%= buyerData && buyerData.email ? buyerData.email : '-' %></strong>
+          </div>
+          <div>
+            <span class="label">Penyelenggara</span>
+            <strong><%= order.items && order.items[0] && order.items[0].ticket && order.items[0].ticket.event && order.items[0].ticket.event.createdBy ? (order.items[0].ticket.event.createdBy.name || order.items[0].ticket.event.createdBy.email) : 'Eventify' %></strong>
+          </div>
+          <div>
+            <span class="label">Jumlah Tiket</span>
+            <strong><%= order.items.reduce((sum, it) => sum + (it.quantity || 0), 0) %></strong>
+          </div>
+        </div>
+      </div>
+      <div class="summary-right">
+        <div class="qr-box">
+          <img alt="QR" src="https://api.qrserver.com/v1/create-qr-code/?size=180x180&data=<%= encodeURIComponent(originUrl + '/ticket/verify/' + qrTokenValue) %>" />
+          <div class="qr-caption">Scan untuk validasi tiket</div>
+          <div class="qr-token"><%= qrTokenValue || '-' %></div>
+        </div>
+      </div>
+    </section>
+
+    <section class="receipt-section">
+      <h3>Rincian Event & Tiket</h3>
+      <div class="receipt-items">
+        <% (order.items || []).forEach(it => { %>
+          <div class="receipt-item">
+            <div class="receipt-item__info">
+              <strong><%= it.ticket.event.title %></strong>
+              <div class="muted">
+                <i class="bi bi-geo-alt"></i>
+                <%= it.ticket.event.location %>
+              </div>
+              <div class="muted">
+                <i class="bi bi-calendar-event"></i>
+                <%= new Date(it.ticket.event.date).toLocaleString('id-ID', { dateStyle: 'medium', timeStyle: 'short' }) %>
+              </div>
+              <div class="muted">
+                <i class="bi bi-ticket-perforated"></i>
+                Jenis Tiket: <%= it.ticket.name || 'General Admission' %>
+              </div>
+            </div>
+            <div class="receipt-item__qty">x<%= it.quantity %></div>
+            <div class="receipt-item__price">Rp <%= it.ticket.price.toLocaleString('id-ID') %></div>
+          </div>
+        <% }) %>
+      </div>
+    </section>
+
+    <section class="receipt-section total">
+      <div class="total-row">
+        <span>Total Pembayaran</span>
+        <strong>Rp <%= (typeof order.totalPrice === 'number' ? order.totalPrice : 0).toLocaleString('id-ID') %></strong>
+      </div>
+    </section>
+
+    <footer class="receipt-footer">
+      <p>Struk ini berlaku sebagai bukti transaksi resmi. Simpan sebagai arsip.</p>
+      <button class="btn-print" onclick="window.print()">
+        <i class="bi bi-printer"></i> Cetak PDF
+      </button>
+    </footer>
+  </div>
+</div>

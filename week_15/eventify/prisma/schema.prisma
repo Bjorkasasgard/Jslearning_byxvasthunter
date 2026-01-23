@@ -17,8 +17,11 @@ model User {
   name      String
   email     String   @unique
   password  String
+  avatarData Bytes?
+  avatarMime String?
   role      Role     @default(USER)
   orders    Order[]
+  events    Event[]
   createdAt DateTime @default(now())
 }
 
@@ -28,6 +31,11 @@ model Event {
   description String
   location    String
   date        DateTime
+  imageUrl    String?
+  imageData   Bytes?
+  imageMime   String?
+  createdById Int?
+  createdBy   User?    @relation(fields: [createdById], references: [id])
   tickets     Ticket[]
   createdAt   DateTime @default(now())
 }
@@ -35,6 +43,7 @@ model Event {
 model Ticket {
   id        Int     @id @default(autoincrement())
   eventId   Int
+  name      String?
   price     Int
   quota     Int
   event     Event   @relation(fields: [eventId], references: [id])
@@ -47,6 +56,8 @@ model Order {
   user      User     @relation(fields: [userId], references: [id])
   items     OrderItem[]
   createdAt DateTime @default(now())
+  status    String   @default("UNPAID")
+  qrToken   String?
 }
 
 model OrderItem {

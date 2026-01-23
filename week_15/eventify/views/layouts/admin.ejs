@@ -1,0 +1,15 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title><%= (typeof pageTitle !== "undefined" && pageTitle) ? `${pageTitle} · Eventify` : "Admin · Eventify" %></title>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" />
+  <link rel="stylesheet" href="/stylesheets/style.css" />
+</head>
+<body class="<%= (typeof bodyClass !== "undefined" && bodyClass) ? bodyClass : '' %>">
+  <main class="page <%= (typeof mainClass !== "undefined" && mainClass) ? mainClass : '' %>">
+    <%- body %>
+  </main>
+</body>
+</html>

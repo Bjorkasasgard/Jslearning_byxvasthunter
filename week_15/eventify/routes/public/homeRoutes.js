@@ -42,7 +42,17 @@ router.get("/", async (req, res, next) => {
             ],
           }
         : undefined,
-      include: { tickets: true },
+      include: {
+        tickets: true,
+        createdBy: {
+          select: {
+            name: true,
+            email: true,
+            avatarData: true,
+            avatarMime: true,
+          },
+        },
+      },
     });
 
     const events = eventsRaw.map((event) => {
@@ -52,12 +62,24 @@ router.get("/", async (req, res, next) => {
 
       const minPrice = prices.length ? Math.min(...prices) : null;
 
+      const creator = event.createdBy;
+      const creatorAvatar = creator && creator.avatarData
+        ? `data:${creator.avatarMime || "image/png"};base64,${Buffer.from(creator.avatarData).toString("base64")}`
+        : null;
+
+      const imageSrc = event.imageData
+        ? `data:${event.imageMime || "image/jpeg"};base64,${Buffer.from(event.imageData).toString("base64")}`
+        : null;
+
       return {
         id: event.id,
         title: event.title,
         location: event.location,
         date: event.date,
         minPrice,
+        imageSrc,
+        creatorName: creator ? creator.name || creator.email : null,
+        creatorAvatar,
       };
     });
 
@@ -106,6 +128,14 @@ router.get("/event/:id", async (req, res, next) => {
   try {
     const event = await prisma.event.findUnique({
       where: { id: Number(req.params.id) },
+      include: {
+        createdBy: {
+          select: {
+            name: true,
+            email: true,
+          },
+        },
+      },
     });
 
     if (!event) {
@@ -118,7 +148,21 @@ router.get("/event/:id", async (req, res, next) => {
       where: { eventId: event.id },
     });
 
-    res.render("pages/eventDetail", { event, tickets });
+    const imageSrc = event.imageData
+      ? `data:${event.imageMime || "image/jpeg"};base64,${Buffer.from(event.imageData).toString("base64")}`
+      : null;
+
+    const eventView = {
+      ...event,
+      imageSrc,
+      organizer: event.createdBy ? event.createdBy.name || event.createdBy.email : event.organizer,
+    };
+
+    res.render("pages/eventDetail", {
+      event: eventView,
+      tickets,
+      errorMessage: req.query && req.query.error ? req.query.error : null,
+    });
   } catch (err) {
     next(err);
   }
