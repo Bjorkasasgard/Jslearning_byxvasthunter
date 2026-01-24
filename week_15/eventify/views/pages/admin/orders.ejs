@@ -5,10 +5,10 @@
         <span>Eventify</span>
       </div>
     </div>
-    
+
     <nav class="sidebar-nav">
       <p class="nav-label">Menu Utama</p>
-      <a href="/admin" class="nav-link active">
+      <a href="/admin" class="nav-link">
         <i class="bi bi-grid-1x2-fill"></i> Dashboard
       </a>
       <a href="/admin/events/create" class="nav-link">
@@ -17,10 +17,10 @@
       <a href="/admin/tickets" class="nav-link">
         <i class="bi bi-ticket-perforated-fill"></i> Kelola Tiket
       </a>
-      <a href="/admin/orders" class="nav-link">
+      <a href="/admin/orders" class="nav-link active">
         <i class="bi bi-receipt"></i> Monitoring Pesanan
       </a>
-      
+
       <p class="nav-label">Data</p>
       <a href="/admin/members" class="nav-link">
         <i class="bi bi-people-fill"></i> Kelola Anggota
@@ -44,82 +44,25 @@
 
   <main class="admin-content">
     <% const stats = (typeof orderStats !== 'undefined' && orderStats) ? orderStats : { total: 0, paid: 0, unpaid: 0 }; %>
-    <% const sales = (typeof totalSales !== 'undefined' && totalSales) ? totalSales : 0; %>
-    <% const ticketsSold = (typeof totalTicketsSold !== 'undefined' && totalTicketsSold) ? totalTicketsSold : 0; %>
-    <% const customers = (typeof customerCount !== 'undefined' && customerCount) ? customerCount : 0; %>
-    
+
     <header class="admin-header">
       <div class="header-title">
-        <h1>Selamat Datang, Admin!</h1>
-        <p>Ringkasan aktivitas dan pengelolaan event Anda hari ini.</p>
+        <h1>Monitoring Pesanan</h1>
+        <p>Pantau status pesanan tiket dari event Anda.</p>
       </div>
       <div class="header-user">
         <div class="user-avatar">A</div>
       </div>
     </header>
 
-    <section class="stats-grid">
-      <div class="stat-card blue">
-        <div class="stat-icon"><i class="bi bi-calendar-check"></i></div>
-        <div class="stat-info">
-          <span>Total Event</span>
-          <h3><%= events.length %></h3>
-        </div>
-      </div>
-      <div class="stat-card green">
-        <div class="stat-icon"><i class="bi bi-ticket-detailed"></i></div>
-        <div class="stat-info">
-          <span>Total Tiket Aktif</span>
-          <h3><%= events.reduce((acc, e) => acc + (e.tickets || []).length, 0) %></h3>
-        </div>
-      </div>
-      <div class="stat-card purple">
-        <div class="stat-icon"><i class="bi bi-receipt"></i></div>
-        <div class="stat-info">
-          <span>Total Pesanan</span>
-          <h3><%= stats.total %></h3>
-        </div>
-      </div>
-      <div class="stat-card green">
-        <div class="stat-icon"><i class="bi bi-check-circle-fill"></i></div>
-        <div class="stat-info">
-          <span>Pesanan Paid</span>
-          <h3><%= stats.paid %></h3>
-        </div>
-      </div>
-      <div class="stat-card purple">
-        <div class="stat-icon"><i class="bi bi-x-circle-fill"></i></div>
-        <div class="stat-info">
-          <span>Pesanan Unpaid</span>
-          <h3><%= stats.unpaid %></h3>
-        </div>
-      </div>
-      <div class="stat-card blue">
-        <div class="stat-icon"><i class="bi bi-cash-stack"></i></div>
-        <div class="stat-info">
-          <span>Total Penjualan</span>
-          <h3>Rp <%= sales.toLocaleString('id-ID') %></h3>
-        </div>
-      </div>
-      <div class="stat-card green">
-        <div class="stat-icon"><i class="bi bi-bag-check"></i></div>
-        <div class="stat-info">
-          <span>Tiket Terjual</span>
-          <h3><%= ticketsSold %></h3>
-        </div>
-      </div>
-      <div class="stat-card purple">
-        <div class="stat-icon"><i class="bi bi-people"></i></div>
-        <div class="stat-info">
-          <span>Pembeli Unik</span>
-          <h3><%= customers %></h3>
-        </div>
-      </div>
-    </section>
     <section class="card-panel full-width">
       <div class="card-header flex-between">
-        <h3>Monitoring Pesanan Terbaru</h3>
-        <a href="/admin/orders" class="btn-pill">Lihat Semua</a>
+        <h3>Daftar Pesanan</h3>
+        <div class="header-badges">
+          <span class="badge"><%= (orders || []).length %> Pesanan</span>
+          <span class="badge badge-success">Paid: <%= stats.paid %></span>
+          <span class="badge badge-danger">Unpaid: <%= stats.unpaid %></span>
+        </div>
       </div>
 
       <div class="card-body p-0">
@@ -140,6 +83,7 @@
                   <th>Qty</th>
                   <th>Total</th>
                   <th>Status</th>
+                  <th>Aksi</th>
                 </tr>
               </thead>
               <tbody>
@@ -166,6 +110,24 @@
                         <%= o.status %>
                       </span>
                     </td>
+                    <td>
+                      <div class="status-actions">
+                        <form method="POST" action="/admin/orders/<%= o.id %>/status">
+                          <%- include("../../partials/csrf") %>
+                          <input type="hidden" name="status" value="PAID" />
+                          <button type="submit" class="btn-pill success" title="Tandai Paid" <%= String(o.status).toUpperCase() === 'PAID' ? 'disabled' : '' %>>
+                            <i class="bi bi-check-circle"></i> Paid
+                          </button>
+                        </form>
+                        <form method="POST" action="/admin/orders/<%= o.id %>/status">
+                          <%- include("../../partials/csrf") %>
+                          <input type="hidden" name="status" value="UNPAID" />
+                          <button type="submit" class="btn-pill danger" title="Tandai Unpaid" <%= String(o.status).toUpperCase() === 'UNPAID' ? 'disabled' : '' %>>
+                            <i class="bi bi-x-circle"></i> Unpaid
+                          </button>
+                        </form>
+                      </div>
+                    </td>
                   </tr>
                 <% }) %>
               </tbody>
@@ -174,10 +136,5 @@
         <% } %>
       </div>
     </section>
-
-    <footer class="admin-footer">
-      &copy; <%= new Date().getFullYear() %> Eventify Admin Panel.
-    </footer>
-
   </main>
 </div>

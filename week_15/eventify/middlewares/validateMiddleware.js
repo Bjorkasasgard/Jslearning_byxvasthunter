@@ -1,12 +1,12 @@
 const validateTarget = (schema, value, target) => {
-  const { error } = schema.validate(value);
+  const { error, value: sanitized } = schema.validate(value, { abortEarly: true, allowUnknown: true, stripUnknown: true });
   if (error) {
     return {
       message: error.details[0].message,
       target,
     };
   }
-  return null;
+  return { sanitized };
 };
 
 module.exports = (schema) => (req, res, next) => {
@@ -15,8 +15,11 @@ module.exports = (schema) => (req, res, next) => {
   // Backward-compatible: if schema is a Joi schema, validate body only
   if (typeof schema.validate === "function") {
     const result = validateTarget(schema, req.body, "body");
-    if (result) {
+    if (result && result.message) {
       return res.status(400).json({ message: result.message });
+    }
+    if (result && result.sanitized) {
+      req.body = result.sanitized;
     }
     return next();
   }
@@ -24,18 +27,21 @@ module.exports = (schema) => (req, res, next) => {
   const errors = [];
 
   if (schema.body) {
-    const err = validateTarget(schema.body, req.body, "body");
-    if (err) errors.push(err);
+    const resBody = validateTarget(schema.body, req.body, "body");
+    if (resBody && resBody.message) errors.push(resBody);
+    if (resBody && resBody.sanitized) req.body = resBody.sanitized;
   }
 
   if (schema.params) {
-    const err = validateTarget(schema.params, req.params, "params");
-    if (err) errors.push(err);
+    const resParams = validateTarget(schema.params, req.params, "params");
+    if (resParams && resParams.message) errors.push(resParams);
+    if (resParams && resParams.sanitized) req.params = resParams.sanitized;
   }
 
   if (schema.query) {
-    const err = validateTarget(schema.query, req.query, "query");
-    if (err) errors.push(err);
+    const resQuery = validateTarget(schema.query, req.query, "query");
+    if (resQuery && resQuery.message) errors.push(resQuery);
+    if (resQuery && resQuery.sanitized) req.query = resQuery.sanitized;
   }
 
   if (errors.length) {

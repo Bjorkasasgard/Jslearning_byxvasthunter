@@ -1,0 +1,96 @@
+<div class="admin-wrapper">
+  <aside class="admin-sidebar">
+    <div class="sidebar-header">
+      <div class="sidebar-brand">
+        <span>Eventify</span>
+      </div>
+    </div>
+
+    <nav class="sidebar-nav">
+      <p class="nav-label">Menu Utama</p>
+      <a href="/admin" class="nav-link">
+        <i class="bi bi-grid-1x2-fill"></i> Dashboard
+      </a>
+      <a href="/admin/events/create" class="nav-link active">
+        <i class="bi bi-calendar-plus-fill"></i> Buat Event
+      </a>
+      <a href="/admin/tickets" class="nav-link">
+        <i class="bi bi-ticket-perforated-fill"></i> Kelola Tiket
+      </a>
+      <a href="/admin/orders" class="nav-link">
+        <i class="bi bi-receipt"></i> Monitoring Pesanan
+      </a>
+
+      <p class="nav-label">Data</p>
+      <a href="/admin/members" class="nav-link">
+        <i class="bi bi-people-fill"></i> Kelola Anggota
+      </a>
+      <a href="/admin/events" class="nav-link">
+        <i class="bi bi-collection-fill"></i> Daftar Event
+      </a>
+    </nav>
+
+    <div class="sidebar-footer">
+      <a href="/" class="nav-link-secondary">
+        <i class="bi bi-box-arrow-up-right"></i> Lihat Website
+      </a>
+      <form method="POST" action="/api/auth/logout">
+        <button type="submit" class="btn-logout">
+          <i class="bi bi-power"></i> Logout
+        </button>
+      </form>
+    </div>
+  </aside>
+
+  <main class="admin-content">
+    <header class="admin-header">
+      <div class="header-title">
+        <h1>Buat Event Baru</h1>
+        <p>Lengkapi informasi event agar siap dipublikasikan.</p>
+      </div>
+      <div class="header-user">
+        <div class="user-avatar">A</div>
+      </div>
+    </header>
+
+    <section class="card-panel">
+      <div class="card-header">
+        <h3><i class="bi bi-plus-circle"></i> Form Event</h3>
+      </div>
+      <div class="card-body">
+        <form class="styled-form" method="POST" action="/admin/events" enctype="multipart/form-data">
+          <%- include("../../partials/csrf") %>
+          <div class="form-group">
+            <label>Nama Event</label>
+            <input name="title" type="text" placeholder="Contoh: Konser Musik 2026" required />
+          </div>
+
+          <div class="form-row">
+            <div class="form-group">
+              <label>Tanggal & Waktu</label>
+              <input name="date" type="datetime-local" required />
+            </div>
+            <div class="form-group">
+              <label>Lokasi</label>
+              <input name="location" type="text" placeholder="Nama Gedung / Kota" required />
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label>Deskripsi</label>
+            <textarea name="description" rows="4" placeholder="Jelaskan detail event..." required></textarea>
+          </div>
+
+          <div class="form-group">
+            <label>Poster Event</label>
+            <div class="file-input-wrapper">
+              <input name="imageFile" type="file" accept="image/*" />
+            </div>
+          </div>
+
+          <button class="btn-primary" type="submit">Simpan Event</button>
+        </form>
+      </div>
+    </section>
+  </main>
+</div>

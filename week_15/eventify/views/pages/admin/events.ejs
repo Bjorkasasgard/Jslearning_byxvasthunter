@@ -1,0 +1,112 @@
+<div class="admin-wrapper">
+  <aside class="admin-sidebar">
+    <div class="sidebar-header">
+      <div class="sidebar-brand">
+        <span>Eventify</span>
+      </div>
+    </div>
+
+    <nav class="sidebar-nav">
+      <p class="nav-label">Menu Utama</p>
+      <a href="/admin" class="nav-link">
+        <i class="bi bi-grid-1x2-fill"></i> Dashboard
+      </a>
+      <a href="/admin/events/create" class="nav-link">
+        <i class="bi bi-calendar-plus-fill"></i> Buat Event
+      </a>
+      <a href="/admin/tickets" class="nav-link">
+        <i class="bi bi-ticket-perforated-fill"></i> Kelola Tiket
+      </a>
+      <a href="/admin/orders" class="nav-link">
+        <i class="bi bi-receipt"></i> Monitoring Pesanan
+      </a>
+
+      <p class="nav-label">Data</p>
+      <a href="/admin/members" class="nav-link">
+        <i class="bi bi-people-fill"></i> Kelola Anggota
+      </a>
+      <a href="/admin/events" class="nav-link active">
+        <i class="bi bi-collection-fill"></i> Daftar Event
+      </a>
+    </nav>
+
+    <div class="sidebar-footer">
+      <a href="/" class="nav-link-secondary">
+        <i class="bi bi-box-arrow-up-right"></i> Lihat Website
+      </a>
+      <form method="POST" action="/api/auth/logout">
+        <button type="submit" class="btn-logout">
+          <i class="bi bi-power"></i> Logout
+        </button>
+      </form>
+    </div>
+  </aside>
+
+  <main class="admin-content">
+    <header class="admin-header">
+      <div class="header-title">
+        <h1>Daftar Event</h1>
+        <p>Kelola event yang sudah Anda buat.</p>
+      </div>
+      <div class="header-user">
+        <div class="user-avatar">A</div>
+      </div>
+    </header>
+
+    <section class="card-panel full-width">
+      <div class="card-header flex-between">
+        <h3>Event Aktif</h3>
+        <span class="badge"><%= events.length %> Event</span>
+      </div>
+
+      <div class="card-body p-0">
+        <% if (events.length === 0) { %>
+          <div class="empty-state">
+            <img src="https://www.svgrepo.com/show/276264/monster.svg" alt="Empty" style="width: 160px; opacity: 0.75;">
+            <h4>Belum ada data</h4>
+            <p>Silakan buat event pertama Anda.</p>
+          </div>
+        <% } else { %>
+          <div class="table-responsive">
+            <table class="admin-table">
+              <thead>
+                <tr>
+                  <th>Judul Event</th>
+                  <th>Tanggal</th>
+                  <th>Lokasi</th>
+                  <th>Tiket</th>
+                  <th>Aksi</th>
+                </tr>
+              </thead>
+              <tbody>
+                <% events.forEach(e => { %>
+                  <tr>
+                    <td>
+                      <div class="event-cell">
+                        <div class="event-icon"><i class="bi bi-calendar-event"></i></div>
+                        <strong><%= e.title %></strong>
+                      </div>
+                    </td>
+                    <td><%= new Date(e.date).toLocaleString('id-ID', { dateStyle: 'medium', timeStyle: 'short' }) %></td>
+                    <td><%= e.location %></td>
+                    <td>
+                      <span class="status-badge success"><%= e.tickets ? e.tickets.length : 0 %> Jenis</span>
+                    </td>
+                    <td>
+                      <a href="/event/<%= e.id %>" class="btn-icon" title="Lihat"><i class="bi bi-eye"></i></a>
+                      <a href="/admin/events/<%= e.id %>/edit" class="btn-action btn-edit">Edit</a>
+                      <form method="POST" action="/admin/events/<%= e.id %>/delete" style="display:inline" onsubmit="return confirm('Yakin hapus event ini?');">
+                        <%- include("../../partials/csrf") %>
+                        <button type="submit" class="btn-action btn-delete">Hapus</button>
+                      </form>
+                    </td>
+                  </tr>
+                <% }) %>
+              </tbody>
+            </table>
+          </div>
+        <% } %>
+      </div>
+    </section>
+  </main>
+</div>

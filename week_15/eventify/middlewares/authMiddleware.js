@@ -1,7 +1,8 @@
 const jwt = require("jsonwebtoken");
 const jwtConfig = require("../config/jwtConfig");
+const prisma = require("../prisma/client");
 
-module.exports = (req, res, next) => {
+module.exports = async (req, res, next) => {
   const token =
     req.cookies[jwtConfig.cookieName] ||
     (req.headers.authorization &&
@@ -17,7 +18,28 @@ module.exports = (req, res, next) => {
   }
 
   try {
-    req.user = jwt.verify(token, jwtConfig.secret);
+    const payload = jwt.verify(token, jwtConfig.secret);
+
+    if (!payload || !payload.id) {
+      if (isApi) {
+        return res.status(401).json({ message: "Invalid token" });
+      }
+      return res.redirect("/login");
+    }
+
+    const user = await prisma.user.findUnique({
+      where: { id: payload.id },
+      select: { id: true, name: true, email: true, role: true },
+    });
+
+    if (!user) {
+      if (isApi) {
+        return res.status(401).json({ message: "Unauthorized" });
+      }
+      return res.redirect("/login");
+    }
+
+    req.user = { ...payload, ...user };
     return next();
   } catch (err) {
     if (isApi) {

@@ -23,6 +23,7 @@
       <% } %>
 
       <form method="POST" action="/register">
+        <%- include("../partials/csrf") %>
         <div class="loket-input-group">
           <label for="register-name">Nama Lengkap</label>
           <input 

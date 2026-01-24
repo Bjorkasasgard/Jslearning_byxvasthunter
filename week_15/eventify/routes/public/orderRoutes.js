@@ -23,14 +23,32 @@ const buildEventImageSrc = (event) => {
 
 const mapOrderView = (order) => {
   const items = (order.items || []).map((item) => {
-    const event = item.ticket && item.ticket.event ? item.ticket.event : null;
-    const imageSrc = buildEventImageSrc(event);
+    // prefer snapshot fields stored on orderItem when available
+    const rawTicket = item.ticket || null;
+    const ticketName = item.ticketName || (rawTicket && rawTicket.name) || null;
+    const ticketPrice = typeof item.ticketPrice === 'number' ? item.ticketPrice : (rawTicket && typeof rawTicket.price === 'number' ? rawTicket.price : 0);
+
+    // event: prefer snapshot fields, otherwise use joined ticket.event
+    const eventFromTicket = rawTicket && rawTicket.event ? rawTicket.event : null;
+    const eventObj = {
+      id: eventFromTicket ? eventFromTicket.id : null,
+      title: item.eventTitle || (eventFromTicket && eventFromTicket.title) || null,
+      date: item.eventDate || (eventFromTicket && eventFromTicket.date) || null,
+      location: item.eventLocation || (eventFromTicket && eventFromTicket.location) || null,
+      imageData: eventFromTicket ? eventFromTicket.imageData : null,
+      imageMime: eventFromTicket ? eventFromTicket.imageMime : null,
+      imageUrl: eventFromTicket ? eventFromTicket.imageUrl : null,
+    };
+
+    const imageSrc = buildEventImageSrc(eventObj);
 
     return {
       ...item,
       ticket: {
-        ...item.ticket,
-        event: event ? { ...event, imageSrc } : event,
+        id: item.ticketId,
+        name: ticketName,
+        price: ticketPrice,
+        event: eventObj ? { ...eventObj, imageSrc } : null,
       },
     };
   });
@@ -337,25 +355,43 @@ router.get("/ticket/verify/:token", async (req, res, next) => {
 
 router.post("/orders", auth, async (req, res, next) => {
   try {
-    const { error } = buyValidation.validate(req.body, { abortEarly: true });
+    // Only validate ticketId and quantity, ignore eventId for validation
+    const { ticketId, quantity } = req.body;
+    const { error } = buyValidation.validate({ ticketId, quantity }, { abortEarly: true });
+    const eventId = req.body.eventId || req.query.eventId || null;
     if (error) {
-      const referer = req.get("referer") || "/";
       const message = encodeURIComponent(error.details[0].message);
+      if (eventId) {
+        return res.redirect(`/event/${eventId}?error=${message}`);
+      }
+      const referer = req.get("referer") || "/";
       return res.redirect(`${referer}${referer.includes("?") ? "&" : "?"}error=${message}`);
     }
 
-    const ticketId = Number(req.body.ticketId);
-    const quantity = Number(req.body.quantity);
+    const ticketIdNum = Number(ticketId);
+    const quantityNum = Number(quantity);
 
-    const order = await orderService.createOrder(req.user.id, [
-      { ticketId, quantity },
-    ]);
+    // Get eventId for redirect
+    const ticket = await prisma.ticket.findUnique({ where: { id: ticketIdNum } });
+    const eventIdFromTicket = ticket ? ticket.eventId : null;
+    const redirectEventId = eventId || eventIdFromTicket;
 
-    res.redirect(`/my/orders?success=1&orderId=${order.id}`);
+    try {
+      const order = await orderService.createOrder(req.user.id, [
+        { ticketId: ticketIdNum, quantity: quantityNum },
+      ]);
+      return res.redirect(`/my/orders?success=1&orderId=${order.id}`);
+    } catch (err) {
+      // If error is about quota, redirect to event detail with error
+      const message = encodeURIComponent(err.message || "Order gagal diproses");
+      if (redirectEventId) {
+        return res.redirect(`/event/${redirectEventId}?error=${message}`);
+      }
+      const referer = req.get("referer") || "/";
+      return res.redirect(`${referer}${referer.includes("?") ? "&" : "?"}error=${message}`);
+    }
   } catch (err) {
-    const referer = req.get("referer") || "/";
-    const message = encodeURIComponent(err.message || "Order gagal diproses");
-    return res.redirect(`${referer}${referer.includes("?") ? "&" : "?"}error=${message}`);
+    next(err);
   }
 });
 

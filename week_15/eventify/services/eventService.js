@@ -17,10 +17,13 @@ exports.getEventById = (id) => {
 };
 
 exports.updateEvent = (id, data) => {
-  return prisma.event.update({
+  console.log('[service][event][updateEvent] id=', id, 'data=', data);
+  const result = prisma.event.update({
     where: { id: Number(id) },
     data,
   });
+  result.then((r) => console.log('[service][event][updateEvent] updated=', { id: r.id })).catch((e) => console.error('[service][event][updateEvent] error=', e && e.message));
+  return result;
 };
 
 exports.deleteEvent = (id) => {

@@ -1,0 +1,121 @@
+<div class="admin-wrapper">
+  <aside class="admin-sidebar">
+    <div class="sidebar-header">
+      <div class="sidebar-brand">
+        <span>Eventify</span>
+      </div>
+    </div>
+
+    <nav class="sidebar-nav">
+      <p class="nav-label">Menu Utama</p>
+      <a href="/admin" class="nav-link">
+        <i class="bi bi-grid-1x2-fill"></i> Dashboard
+      </a>
+      <a href="/admin/events/create" class="nav-link">
+        <i class="bi bi-calendar-plus-fill"></i> Buat Event
+      </a>
+      <a href="/admin/tickets" class="nav-link">
+        <i class="bi bi-ticket-perforated-fill"></i> Kelola Tiket
+      </a>
+      <a href="/admin/orders" class="nav-link">
+        <i class="bi bi-receipt"></i> Monitoring Pesanan
+      </a>
+
+      <p class="nav-label">Data</p>
+      <a href="/admin/members" class="nav-link active">
+        <i class="bi bi-people-fill"></i> Kelola Anggota
+      </a>
+      <a href="/admin/events" class="nav-link">
+        <i class="bi bi-collection-fill"></i> Daftar Event
+      </a>
+    </nav>
+
+    <div class="sidebar-footer">
+      <a href="/" class="nav-link-secondary">
+        <i class="bi bi-box-arrow-up-right"></i> Lihat Website
+      </a>
+      <form method="POST" action="/api/auth/logout">
+        <button type="submit" class="btn-logout">
+          <i class="bi bi-power"></i> Logout
+        </button>
+      </form>
+    </div>
+  </aside>
+
+  <main class="admin-content">
+    <% const members = (typeof users !== 'undefined' && users) ? users : []; %>
+    <% const currentAdminId = (typeof currentUserId !== 'undefined' && currentUserId) ? currentUserId : null; %>
+
+    <header class="admin-header">
+      <div class="header-title">
+        <h1>Kelola Anggota</h1>
+        <p>Atur role pengguna menjadi Admin atau User (Member).</p>
+      </div>
+      <div class="header-user">
+        <div class="user-avatar">A</div>
+      </div>
+    </header>
+
+    <section class="card-panel full-width">
+      <div class="card-header flex-between">
+        <h3>Daftar Pengguna</h3>
+        <span class="badge"><%= members.length %> Pengguna</span>
+      </div>
+
+      <div class="card-body p-0">
+        <% if (members.length === 0) { %>
+          <div class="empty-state">
+            <img src="https://www.svgrepo.com/show/401861/people.svg" alt="Empty" style="width: 160px; opacity: 0.75;">
+            <h4>Belum ada pengguna</h4>
+            <p>Pengguna yang terdaftar akan muncul di sini.</p>
+          </div>
+        <% } else { %>
+          <div class="table-responsive">
+            <table class="admin-table">
+              <thead>
+                <tr>
+                  <th>Nama</th>
+                  <th>Email</th>
+                  <th>Role</th>
+                  <th>Aksi</th>
+                </tr>
+              </thead>
+              <tbody>
+                <% members.forEach(u => { %>
+                  <tr>
+                    <td>
+                      <div class="event-cell">
+                        <div class="event-icon"><i class="bi bi-person-badge"></i></div>
+                        <strong><%= u.name %></strong>
+                      </div>
+                      <div class="text-muted-sm">#<%= u.id %></div>
+                    </td>
+                    <td><%= u.email %></td>
+                    <td>
+                      <span class="status-badge <%= u.role === 'ADMIN' ? 'success' : 'status-pending' %>">
+                        <%= u.role === 'ADMIN' ? 'ADMIN' : 'USER' %>
+                      </span>
+                    </td>
+                    <td>
+                      <form class="inline-form" method="POST" action="/admin/users/<%= u.id %>/role">
+                        <%- include("../../partials/csrf") %>
+                        <select name="role" <%= currentAdminId === u.id ? 'disabled' : '' %>>
+                          <option value="USER" <%= u.role === 'USER' ? 'selected' : '' %>>User</option>
+                          <option value="ADMIN" <%= u.role === 'ADMIN' ? 'selected' : '' %>>Admin</option>
+                        </select>
+                        <button type="submit" class="btn-secondary btn-sm" <%= currentAdminId === u.id ? 'disabled' : '' %>>Simpan</button>
+                      </form>
+                      <% if (currentAdminId === u.id) { %>
+                        <div class="text-muted-sm">Akun Anda</div>
+                      <% } %>
+                    </td>
+                  </tr>
+                <% }) %>
+              </tbody>
+            </table>
+          </div>
+        <% } %>
+      </div>
+    </section>
+  </main>
+</div>

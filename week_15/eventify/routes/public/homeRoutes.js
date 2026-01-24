@@ -17,7 +17,7 @@ const renderAuthPage = (res, view, options = {}) => {
 };
 
 const validateAuthForm = (schema, view, mapValues) => (req, res, next) => {
-  const { error } = schema.validate(req.body, { abortEarly: true });
+  const { error } = schema.validate(req.body, { abortEarly: true, allowUnknown: true, stripUnknown: true });
   if (error) {
     return renderAuthPage(res, view, {
       message: error.details[0].message,
@@ -158,10 +158,15 @@ router.get("/event/:id", async (req, res, next) => {
       organizer: event.createdBy ? event.createdBy.name || event.createdBy.email : event.organizer,
     };
 
+    const baseUrl = `${req.protocol}://${req.get('host')}`;
     res.render("pages/eventDetail", {
       event: eventView,
       tickets,
       errorMessage: req.query && req.query.error ? req.query.error : null,
+      isAdmin: res.locals.isAdmin,
+      isAuthenticated: res.locals.isAuthenticated,
+      baseUrl,
+      currentPath: req.originalUrl,
     });
   } catch (err) {
     next(err);

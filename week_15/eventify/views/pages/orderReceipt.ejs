@@ -82,9 +82,34 @@
 
     <footer class="receipt-footer">
       <p>Struk ini berlaku sebagai bukti transaksi resmi. Simpan sebagai arsip.</p>
-      <button class="btn-print" onclick="window.print()">
+      <button type="button" class="btn-print">
         <i class="bi bi-printer"></i> Cetak PDF
       </button>
     </footer>
   </div>
 </div>
+<noscript>
+  <div style="padding:12px;background:#fff3cd;color:#856404;border:1px solid #ffeeba;margin-top:12px;">
+    JavaScript dinonaktifkan — gunakan fitur Print/PDF dari menu browser.
+  </div>
+</noscript>
+<script>
+  (function(){
+    document.addEventListener('DOMContentLoaded', function(){
+      const btn = document.querySelector('.btn-print');
+      if (!btn) return;
+      btn.addEventListener('click', function (e) {
+        e.preventDefault();
+        try {
+          if (typeof window.print === 'function') {
+            window.print();
+          } else {
+            alert('Fitur cetak tidak tersedia pada browser ini. Gunakan Print dari menu browser.');
+          }
+        } catch (err) {
+          try { alert('Terjadi kesalahan saat mencoba mencetak. Silakan gunakan Print dari menu browser.'); } catch (ignore) {}
+        }
+      });
+    });
+  })();
+</script>

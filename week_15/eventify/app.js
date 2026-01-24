@@ -23,9 +23,23 @@ app.set("layout", "layouts/main");
 app.use(logger("dev"));
 app.use(
   helmet({
-    contentSecurityPolicy: false,
+    // enable a reasonable CSP; allow inline for styles/scripts to avoid breaking existing templates
+    contentSecurityPolicy: {
+      directives: {
+        defaultSrc: ["'self'"],
+        scriptSrc: ["'self'", "'unsafe-inline'", 'https://cdn.jsdelivr.net'],
+        styleSrc: ["'self'", "'unsafe-inline'", 'https://cdn.jsdelivr.net'],
+        imgSrc: ["'self'", 'data:', 'https://api.qrserver.com'],
+        connectSrc: ["'self'"],
+        fontSrc: ["'self'", 'data:', 'https://cdn.jsdelivr.net'],
+        objectSrc: ["'none'"],
+      },
+    },
   })
 );
+
+// Additional security headers (lightweight, safe)
+app.use(require("./middlewares/securityHeaders"));
 
 app.use(
   "/api",
@@ -41,6 +55,9 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
 app.use(require("./middlewares/viewLocals"));
+
+// CSRF protection for web routes (API routes are JWT-protected and skipped)
+app.use(require("./middlewares/csrfMiddleware"));
 app.use(express.static(path.join(__dirname, "public")));
 
 // ================= ROUTES =================

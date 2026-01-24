@@ -1,0 +1,161 @@
+<div class="admin-wrapper">
+  <aside class="admin-sidebar">
+    <div class="sidebar-header">
+      <div class="sidebar-brand">
+        <span>Eventify</span>
+      </div>
+    </div>
+
+    <nav class="sidebar-nav">
+      <p class="nav-label">Menu Utama</p>
+      <a href="/admin" class="nav-link">
+        <i class="bi bi-grid-1x2-fill"></i> Dashboard
+      </a>
+      <a href="/admin/events/create" class="nav-link">
+        <i class="bi bi-calendar-plus-fill"></i> Buat Event
+      </a>
+      <a href="/admin/tickets" class="nav-link active">
+        <i class="bi bi-ticket-perforated-fill"></i> Kelola Tiket
+      </a>
+      <a href="/admin/orders" class="nav-link">
+        <i class="bi bi-receipt"></i> Monitoring Pesanan
+      </a>
+
+      <p class="nav-label">Data</p>
+      <a href="/admin/members" class="nav-link">
+        <i class="bi bi-people-fill"></i> Kelola Anggota
+      </a>
+      <a href="/admin/events" class="nav-link">
+        <i class="bi bi-collection-fill"></i> Daftar Event
+      </a>
+    </nav>
+
+    <div class="sidebar-footer">
+      <a href="/" class="nav-link-secondary">
+        <i class="bi bi-box-arrow-up-right"></i> Lihat Website
+      </a>
+      <form method="POST" action="/api/auth/logout">
+        <button type="submit" class="btn-logout">
+          <i class="bi bi-power"></i> Logout
+        </button>
+      </form>
+    </div>
+  </aside>
+
+  <main class="admin-content">
+    <header class="admin-header">
+      <div class="header-title">
+        <h1>Kelola Tiket</h1>
+        <p>Terbitkan tiket untuk event yang sudah dibuat.</p>
+      </div>
+      <div class="header-user">
+        <div class="user-avatar">A</div>
+      </div>
+    </header>
+
+    <section class="card-panel">
+      <% if (typeof errorMessage !== 'undefined' && errorMessage) { %>
+        <div class="admin-error-banner">
+          <i class="bi bi-exclamation-circle-fill"></i>
+          <span><%= errorMessage %></span>
+        </div>
+      <% } %>
+      <div class="card-header">
+        <h3><i class="bi bi-tags"></i> Publikasi Tiket</h3>
+      </div>
+      <div class="card-body">
+        <form class="styled-form" method="POST" action="/admin/tickets">
+          <%- include("../../partials/csrf") %>
+          <div class="form-group">
+            <label>Pilih Event</label>
+            <select name="eventId" required>
+              <option value="" disabled selected>-- Pilih Event --</option>
+              <% events.forEach(e => { %>
+                <option value="<%= e.id %>"><%= e.title %></option>
+              <% }) %>
+            </select>
+          </div>
+
+          <div class="form-group">
+            <label>Nama Tiket</label>
+            <input name="name" type="text" placeholder="Contoh: VIP, Regular" required />
+          </div>
+
+          <div class="form-group">
+            <label>Harga Tiket (IDR)</label>
+            <div class="input-group">
+              <span class="prefix">Rp</span>
+              <input name="price" type="number" min="0" placeholder="0" required />
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label>Kuota Tiket</label>
+            <input name="quota" type="number" min="1" placeholder="Jumlah tiket tersedia" required />
+          </div>
+
+          <button class="btn-secondary" type="submit">Terbitkan Tiket</button>
+        </form>
+
+        <div class="info-box">
+          <i class="bi bi-info-circle-fill"></i>
+          <p>Pastikan event sudah dibuat sebelum menambahkan tiket.</p>
+        </div>
+      </div>
+    </section>
+
+    <section class="card-panel full-width">
+      <div class="card-header flex-between">
+        <h3>Ringkasan Tiket</h3>
+        <span class="badge"><%= events.reduce((acc, e) => acc + (e.tickets || []).length, 0) %> Tiket</span>
+      </div>
+      <div class="card-body p-0">
+        <% if (events.length === 0) { %>
+          <div class="empty-state">
+            <img src="https://www.svgrepo.com/show/276264/monster.svg" alt="Empty" style="width: 160px; opacity: 0.75;">
+            <h4>Belum ada event</h4>
+            <p>Buat event agar tiket bisa diterbitkan.</p>
+          </div>
+        <% } else { %>
+          <div class="table-responsive">
+            <table class="admin-table">
+              <thead>
+                <tr>
+                  <th>Event</th>
+                  <th>Jenis Tiket</th>
+                  <th>Harga</th>
+                  <th>Kuota</th>
+                  <th>Aksi</th>
+                </tr>
+              </thead>
+              <tbody>
+                <% events.forEach(e => {
+                  (e.tickets || []).forEach(t => { %>
+                  <tr>
+                    <td>
+                      <div class="event-cell">
+                        <div class="event-icon"><i class="bi bi-calendar-event"></i></div>
+                        <strong><%= e.title %></strong>
+                      </div>
+                    </td>
+                    <td><%= t.name %></td>
+                    <td>Rp<%= t.price.toLocaleString('id-ID') %></td>
+                    <td><%= t.quota %></td>
+                    <td>
+                      <a href="/admin/tickets/<%= t.id %>/edit" class="btn-action btn-edit">Edit</a>
+                      <form method="POST" action="/admin/tickets/<%= t.id %>/delete" style="display:inline" onsubmit="return confirm('Yakin hapus tiket ini?');">
+                        <%- include("../../partials/csrf") %>
+                        <button type="submit" class="btn-action btn-delete">Hapus</button>
+                      </form>
+                    </td>
+                  </tr>
+                <% })
+                }) %>
+              </tbody>
+            </table>
+          </div>
+        <% } %>
+      </div>
+    </section>
+  </main>
+</div>

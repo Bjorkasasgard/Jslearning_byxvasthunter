@@ -66,6 +66,13 @@ model OrderItem {
   ticketId Int
   quantity Int
 
+  // Snapshot fields to preserve order details even if ticket/event are later edited
+  ticketName   String?
+  ticketPrice  Int?
+  eventTitle   String?
+  eventDate    DateTime?
+  eventLocation String?
+
   order  Order  @relation(fields: [orderId], references: [id])
   ticket Ticket @relation(fields: [ticketId], references: [id])
 }

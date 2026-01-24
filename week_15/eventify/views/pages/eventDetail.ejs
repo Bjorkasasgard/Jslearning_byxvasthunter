@@ -1,8 +1,8 @@
-<% const prices = (tickets || []).map((t) => t.price).filter((p) => typeof p === "number"); %>
-<% const minPrice = prices.length ? Math.min(...prices) : null; %>
+<% var prices = (tickets || []).map(function(t) { return t.price; }).filter(function(p) { return typeof p === 'number'; }); %>
+<% var minPrice = prices.length ? Math.min.apply(null, prices) : null; %>
 
 <div class="event-header-strip">
-  <div class="event-header-bg" style="background-image: url('<%= event.imageSrc || 'https://placehold.co/1200x600?text=Event+Cover' %>')"></div>
+  <div class="event-header-bg" style="background-image: url('<% if (event && event.imageSrc) { %><%= event.imageSrc %><% } else { %>https://placehold.co/1200x600?text=Event+Cover<% } %>')"></div>
   <div class="container">
     <div class="event-header-content">
       <h1><%= event.title %></h1>
@@ -25,9 +25,9 @@
 
 
       <% if (typeof errorMessage !== 'undefined' && errorMessage) { %>
-        <div class="event-alert">
+        <div class="event-alert event-error">
           <i class="bi bi-exclamation-triangle"></i>
-          <span><%= errorMessage %></span>
+          <span><%= decodeURIComponent(errorMessage) %></span>
         </div>
       <% } %>
 
@@ -46,10 +46,10 @@
         <% } %>
 
         <div class="ticket-list-clean">
-          <% (tickets || []).forEach((t, idx) => { %>
+          <% (tickets || []).forEach(function(t, idx) { %>
             <div class="ticket-item">
               <div class="ticket-info">
-                <h4><%= t.name || `General Admission #${idx + 1}` %></h4>
+                <h4><%= t.name || ('General Admission #' + (idx + 1)) %></h4>
                 <p class="ticket-quota">Sisa kuota: <%= t.quota %></p>
                 <% if (t.quota && t.quota > 0) { %>
                   <span class="status-badge success">Tersedia</span>
@@ -83,7 +83,11 @@
     <aside class="event-right-column">
       <div class="event-sidebar-card">
         <div class="event-poster-wrapper">
-          <img src="<%= event.imageSrc || 'https://placehold.co/600x400?text=No+Image' %>" alt="<%= event.title %>" class="event-poster-img" />
+          <% if (event && event.imageSrc) { %>
+            <img src="<%= event.imageSrc %>" alt="<%= event.title %>" class="event-poster-img" />
+          <% } else { %>
+            <img src="https://placehold.co/600x400?text=No+Image" alt="<%= event.title %>" class="event-poster-img" />
+          <% } %>
         </div>
 
         <div class="sidebar-content">
@@ -124,16 +128,20 @@
           </div>
 
           <div class="sidebar-actions">
-            <% if (!isAuthenticated) { %>
+            <% if (isAdmin) { %>
+              <div class="event-alert"><i class="bi bi-shield-lock"></i> Admin tidak dapat memesan tiket.</div>
+            <% } else if (!isAuthenticated) { %>
               <a href="/login" class="btn-buy-block">Login untuk Membeli</a>
             <% } else { %>
-              <form class="checkout-form-mini" method="POST" action="/orders">
+                  <form class="checkout-form-mini" method="POST" action="/orders">
+                    <%- include("../partials/csrf") %>
+                <input type="hidden" name="eventId" value="<%= event.id %>" />
                 <div class="mini-field">
                   <label>Pilih Tiket:</label>
                   <select name="ticketId" id="checkout-select" required>
-                    <% (tickets || []).forEach((t, idx) => { %>
+                    <% (tickets || []).forEach(function(t, idx) { %>
                       <option value="<%= t.id %>" <%= t.quota && t.quota > 0 ? '' : 'disabled' %>>
-                        <%= t.name || `General Admission #${idx + 1}` %> - Rp <%= t.price.toLocaleString('id-ID') %>
+                        <%= t.name || ('General Admission #' + (idx + 1)) %> - Rp <%= t.price.toLocaleString('id-ID') %>
                         <%= t.quota && t.quota > 0 ? '' : ' (Sold Out)' %>
                       </option>
                     <% }) %>
@@ -150,11 +158,10 @@
 
           <div class="share-section">
             <span>Bagikan Event</span>
-            <div class="share-icons">
-              <button type="button" aria-label="Salin tautan"><i class="bi bi-link-45deg"></i></button>
-              <button type="button" aria-label="Bagikan ke WhatsApp"><i class="bi bi-whatsapp"></i></button>
-              <button type="button" aria-label="Bagikan ke Facebook"><i class="bi bi-facebook"></i></button>
-              <button type="button" aria-label="Bagikan ke Twitter"><i class="bi bi-twitter-x"></i></button>
+            <div class="share-icons"> 
+              <a class="share-link" target="_blank" rel="noopener" aria-label="Bagikan ke WhatsApp" href="https://api.whatsapp.com/send?text=<%= encodeURIComponent(event.title + '\n' + (baseUrl + currentPath)) %>"><i class="bi bi-whatsapp"></i></a>
+              <a class="share-link" target="_blank" rel="noopener" aria-label="Bagikan ke Facebook" href="https://www.facebook.com/sharer/sharer.php?u=<%= encodeURIComponent(baseUrl + currentPath) %>"><i class="bi bi-facebook"></i></a>
+              <a class="share-link" target="_blank" rel="noopener" aria-label="Bagikan ke Twitter" href="https://twitter.com/intent/tweet?text=<%= encodeURIComponent(event.title) %>&url=<%= encodeURIComponent(baseUrl + currentPath) %>"><i class="bi bi-twitter-x"></i></a>
             </div>
           </div>
         </div>

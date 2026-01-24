@@ -11,7 +11,6 @@ describe("E2E: order flow", () => {
   jest.setTimeout(30_000);
 
   let userEmail;
-  let userId;
   let token;
   let event;
   let ticket;
@@ -33,7 +32,7 @@ describe("E2E: order flow", () => {
       .expect(200);
 
     token = loginRes.body.token;
-    userId = loginRes.body.user.id;
+    // user id available as loginRes.body.user.id if needed
 
     event = await prisma.event.create({
       data: {

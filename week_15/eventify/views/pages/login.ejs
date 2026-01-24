@@ -23,6 +23,7 @@
       <% } %>
 
       <form method="POST" action="/login">
+        <%- include("../partials/csrf") %>
         <div class="loket-input-group">
           <label for="login-email">Email</label>
           <input 

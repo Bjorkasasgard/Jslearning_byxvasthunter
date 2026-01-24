@@ -8,6 +8,7 @@ router.use("/", require("./public/adminRoutes"));
 // API
 router.use("/api/health", require("./api/healthRoutes"));
 router.use("/api/auth", require("./api/authRoutes"));
+router.use("/api/admin", require("./api/adminRoutes"));
 router.use("/api/events", require("./api/eventRoutes"));
 router.use("/api/tickets", require("./api/ticketRoutes"));
 router.use("/api/orders", require("./api/orderRoutes"));

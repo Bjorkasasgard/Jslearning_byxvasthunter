@@ -1,0 +1,44 @@
+<div class="admin-wrapper">
+  <main class="admin-content">
+    <header class="admin-header">
+      <div class="header-title">
+        <h1>Edit Tiket</h1>
+        <p>Perbarui data tiket event.</p>
+      </div>
+    </header>
+    <section class="card-panel">
+      <div class="card-header">
+        <h3><i class="bi bi-pencil-square"></i> Edit Tiket</h3>
+      </div>
+      <div class="card-body">
+        <form class="styled-form" method="POST" action="/admin/tickets/<%= ticket.id %>/edit">
+          <div class="form-group">
+            <label>Pilih Event</label>
+            <select name="eventId" required>
+              <% events.forEach(e => { %>
+                <option value="<%= e.id %>" <%= ticket.eventId === e.id ? 'selected' : '' %>><%= e.title %></option>
+              <% }) %>
+            </select>
+          </div>
+          <div class="form-group">
+            <label>Nama Tiket</label>
+            <input name="name" type="text" value="<%= ticket.name %>" required />
+          </div>
+          <div class="form-group">
+            <label>Harga Tiket (IDR)</label>
+            <div class="input-group">
+              <span class="prefix">Rp</span>
+              <input name="price" type="number" min="0" value="<%= ticket.price %>" required />
+            </div>
+          </div>
+          <div class="form-group">
+            <label>Kuota Tiket</label>
+            <input name="quota" type="number" min="1" value="<%= ticket.quota %>" required />
+          </div>
+          <button class="btn-secondary" type="submit">Simpan Perubahan</button>
+          <a href="/admin/tickets" class="btn-link">Batal</a>
+        </form>
+      </div>
+    </section>
+  </main>
+</div>

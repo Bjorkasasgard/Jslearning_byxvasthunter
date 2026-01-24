@@ -16,7 +16,7 @@ module.exports = async (req, res, next) => {
     const payload = jwt.verify(token, jwtConfig.secret);
     let userPayload = payload;
 
-    if ((!payload.name && !payload.email) && payload.id) {
+    if (payload && payload.id) {
       const user = await prisma.user.findUnique({
         where: { id: payload.id },
         select: { id: true, name: true, email: true, role: true },
