@@ -11,6 +11,14 @@
         <h3><i class="bi bi-pencil-square"></i> Edit Event</h3>
       </div>
       <div class="card-body">
+        <% if (typeof errorMessage !== 'undefined' && errorMessage) { %>
+          <div class="event-alert event-alert--danger animate-fade-in mb-4">
+            <div class="alert-content">
+              <i class="bi bi-exclamation-triangle-fill"></i>
+              <span><%= errorMessage %></span>
+            </div>
+          </div>
+        <% } %>
         <form class="styled-form" method="POST" action="/admin/events/<%= event.id %>/edit" enctype="multipart/form-data">
           <div class="form-group">
             <label>Judul Event</label>

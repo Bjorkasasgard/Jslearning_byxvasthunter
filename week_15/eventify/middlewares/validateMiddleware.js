@@ -16,6 +16,15 @@ module.exports = (schema) => (req, res, next) => {
   if (typeof schema.validate === "function") {
     const result = validateTarget(schema, req.body, "body");
     if (result && result.message) {
+      // If this is a browser admin create event POST, render the create form with UI error
+      if (req.originalUrl && req.originalUrl === "/admin/events" && req.method === "POST") {
+        // Provide sticky values via `event` for the template
+        return res.status(400).render("pages/admin/createEvent", {
+          pageTitle: "Buat Event",
+          errorMessage: result.message,
+          event: req.body,
+        });
+      }
       return res.status(400).json({ message: result.message });
     }
     if (result && result.sanitized) {
@@ -45,6 +54,16 @@ module.exports = (schema) => (req, res, next) => {
   }
 
   if (errors.length) {
+    // If admin creating event via standard form, render create page with UI error
+    if (req.originalUrl && req.originalUrl === "/admin/events" && req.method === "POST") {
+      return res.status(400).render("pages/admin/createEvent", {
+        pageTitle: "Buat Event",
+        errorMessage: errors[0].message,
+        event: req.body,
+      });
+    }
+
+    // Fallback: return JSON for API or other callers
     return res.status(400).json({ message: errors[0].message });
   }
 

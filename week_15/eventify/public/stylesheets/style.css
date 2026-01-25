@@ -400,6 +400,145 @@
     }
   }
 
+/* --- ADMIN EVENTS: Header, Search, Table & Actions --- */
+.header-actions .btn-primary {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 20px;
+}
+
+/* --- SEARCH BAR MINI (Table Header) --- */
+.search-box-mini {
+  position: relative;
+  width: 240px;
+}
+
+.search-box-mini i {
+  position: absolute;
+  left: 12px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: #94a3b8;
+  font-size: 14px;
+}
+
+.search-box-mini input {
+  width: 100%;
+  padding: 8px 12px 8px 36px;
+  border: 1px solid #e2e8f0;
+  border-radius: 8px;
+  font-size: 13px;
+  outline: none;
+  transition: 0.2s;
+}
+
+.search-box-mini input:focus {
+  border-color: #3b82f6;
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+}
+
+/* --- TABLE CONTENT STYLING --- */
+.align-middle td {
+  vertical-align: middle !important;
+}
+
+/* Event Thumbnail & Meta */
+.event-thumb-mini {
+  width: 48px;
+  height: 48px;
+  border-radius: 8px;
+  object-fit: cover;
+  border: 1px solid #f1f5f9;
+}
+
+.event-icon-bg {
+  width: 48px;
+  height: 48px;
+  background: #eff6ff;
+  color: #3b82f6;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 20px;
+}
+
+.event-info-text {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.status-dot {
+  font-size: 11px;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  color: #64748b;
+}
+
+.status-dot::before {
+  content: '';
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  display: inline-block;
+}
+
+.status-dot.success::before { background: #22c55e; } /* Hijau (Upcoming) */
+.status-dot.secondary::before { background: #94a3b8; } /* Abu (Selesai) */
+
+/* Date Column */
+.date-col {
+  display: flex;
+  flex-direction: column;
+}
+
+.date-main {
+  font-weight: 600;
+  color: #334155;
+  font-size: 14px;
+}
+
+.date-sub {
+  font-size: 12px;
+  color: #94a3b8;
+}
+
+/* Location */
+.location-text {
+  color: #64748b;
+  font-size: 13px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+/* Ticket Count Badge */
+.ticket-count-badge {
+  background: #f0fdf4;
+  color: #166534;
+  padding: 4px 10px;
+  border-radius: 6px;
+  font-size: 12px;
+  font-weight: 600;
+  display: inline-flex;
+  gap: 6px;
+}
+
+/* Action Buttons Specific */
+.btn-icon-soft.view {
+  background: #f0f9ff;
+  color: #0ea5e9;
+}
+.btn-icon-soft.view:hover { background: #e0f2fe; color: #0284c7; }
+
+/* Responsive Hide */
+@media (max-width: 640px) {
+  .search-box-mini { display: none; }
+}
+  
   .hero__banner {
     width: 100%;
     border-radius: 12px;
@@ -2639,3 +2778,187 @@
       border: 1px solid #E5E7EB;
     }
   }
+
+/* --- TICKET PAGE LAYOUT --- */
+.ticket-layout-grid {
+  display: grid;
+  grid-template-columns: 320px 1fr; /* Form lebar 320px, Sisanya Tabel */
+  gap: 24px;
+  align-items: start;
+}
+
+/* Responsif untuk Tablet/HP */
+@media (max-width: 992px) {
+  .ticket-layout-grid {
+    grid-template-columns: 1fr; /* Stack ke bawah */
+  }
+}
+
+/* Form Sidebar Sticky */
+.sticky-panel {
+  position: sticky;
+  top: 20px; /* Jarak dari atas saat scroll */
+}
+
+/* Form Elements Styling */
+.select-wrapper {
+  position: relative;
+}
+
+.select-icon {
+  position: absolute;
+  right: 14px;
+  top: 50%;
+  transform: translateY(-50%);
+  pointer-events: none;
+  color: #64748b;
+  font-size: 12px;
+}
+
+.form-select {
+  appearance: none;
+  background: white;
+  cursor: pointer;
+}
+
+.form-row.compact {
+  gap: 12px;
+}
+
+.info-note {
+  background: #f8fafc;
+  padding: 12px;
+  border-radius: 8px;
+  border: 1px dashed #cbd5e1;
+  display: flex;
+  gap: 8px;
+  font-size: 13px;
+  color: #64748b;
+}
+
+.w-100 { width: 100%; }
+.mt-2 { margin-top: 0.5rem; }
+.mt-3 { margin-top: 1rem; }
+.mb-4 { margin-bottom: 1.5rem; }
+
+/* --- TABLE STYLING --- */
+.badge-pill {
+  background: #eff6ff;
+  color: #3b82f6;
+  padding: 4px 12px;
+  border-radius: 99px;
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.event-meta-cell {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.event-dot {
+  width: 8px;
+  height: 8px;
+  background: #3b82f6; /* Warna biru loket */
+  border-radius: 50%;
+  display: inline-block;
+  flex-shrink: 0;
+}
+
+.event-name {
+  font-weight: 600;
+  color: #0f172a;
+  line-height: 1.3;
+}
+
+.ticket-tag {
+  background: #f1f5f9;
+  padding: 4px 10px;
+  border-radius: 6px;
+  font-size: 13px;
+  color: #475569;
+  font-weight: 500;
+  border: 1px solid #e2e8f0;
+}
+
+.font-bold { font-weight: 600; color: #0f172a; }
+
+.quota-badge {
+  color: #64748b;
+  font-size: 13px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+/* Action Buttons (Icons) */
+.text-right { text-align: right; }
+
+.action-group {
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+}
+
+.btn-icon-soft {
+  width: 32px;
+  height: 32px;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: none;
+  cursor: pointer;
+  transition: all 0.2s;
+  font-size: 14px;
+}
+
+.btn-icon-soft.edit {
+  background: #eff6ff;
+  color: #3b82f6;
+}
+.btn-icon-soft.edit:hover { background: #dbeafe; color: #2563eb; }
+
+.btn-icon-soft.delete {
+  background: #fef2f2;
+  color: #ef4444;
+}
+.btn-icon-soft.delete:hover { background: #fee2e2; color: #dc2626; }
+
+/* Empty State */
+.empty-state {
+  padding: 60px 20px;
+  text-align: center;
+  color: #64748b;
+}
+
+.empty-icon-bg {
+  width: 64px;
+  height: 64px;
+  background: #f1f5f9;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0 auto 16px;
+  font-size: 28px;
+  color: #94a3b8;
+}
+
+/* Error Banner */
+.event-alert--danger {
+  background: #fef2f2;
+  border: 1px solid #fee2e2;
+  color: #991b1b;
+  padding: 12px 16px;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+}
+
+.event-alert--danger .alert-content {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+}

@@ -72,7 +72,16 @@ router.post(
       });
       const { error } = dynamicSchema.validate(updateData);
       if (error) {
-        return res.status(400).json({ message: error.details[0].message });
+        // Fetch original event for sticky form fields
+        const event = await eventService.getEventById(eventId);
+        // Overwrite with attempted user input for sticky form
+        const stickyEvent = { ...event, ...updateData };
+        applyAdminLayout(res);
+        return res.status(400).render("pages/admin/editEvent", {
+          event: stickyEvent,
+          pageTitle: "Edit Event",
+          errorMessage: error.details[0].message
+        });
       }
       await eventService.updateEvent(eventId, updateData);
       res.redirect("/admin/events");

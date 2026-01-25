@@ -58,27 +58,36 @@
         <h3><i class="bi bi-plus-circle"></i> Form Event</h3>
       </div>
       <div class="card-body">
+        <% if (typeof errorMessage !== 'undefined' && errorMessage) { %>
+          <div class="event-alert event-alert--danger animate-fade-in mb-4">
+            <div class="alert-content">
+              <i class="bi bi-exclamation-triangle-fill"></i>
+              <span><%= errorMessage %></span>
+            </div>
+          </div>
+        <% } %>
+
         <form class="styled-form" method="POST" action="/admin/events" enctype="multipart/form-data">
           <%- include("../../partials/csrf") %>
           <div class="form-group">
             <label>Nama Event</label>
-            <input name="title" type="text" placeholder="Contoh: Konser Musik 2026" required />
+            <input name="title" type="text" placeholder="Contoh: Konser Musik 2026" value="<%= typeof event !== 'undefined' && event.title ? event.title : '' %>" required />
           </div>
 
           <div class="form-row">
             <div class="form-group">
               <label>Tanggal & Waktu</label>
-              <input name="date" type="datetime-local" required />
+              <input name="date" type="datetime-local" value="<%= typeof event !== 'undefined' && event.date ? (new Date(event.date)).toISOString().slice(0,16) : '' %>" required />
             </div>
             <div class="form-group">
               <label>Lokasi</label>
-              <input name="location" type="text" placeholder="Nama Gedung / Kota" required />
+              <input name="location" type="text" placeholder="Nama Gedung / Kota" value="<%= typeof event !== 'undefined' && event.location ? event.location : '' %>" required />
             </div>
           </div>
 
           <div class="form-group">
             <label>Deskripsi</label>
-            <textarea name="description" rows="4" placeholder="Jelaskan detail event..." required></textarea>
+            <textarea name="description" rows="4" placeholder="Jelaskan detail event..." required><%= typeof event !== 'undefined' && event.description ? event.description : '' %></textarea>
           </div>
 
           <div class="form-group">
